@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "DataSet.h"
-#include "lbfgs.h"
+#include "./lbfgs/lbfgs.h"
 
 class LogisticRegression {
 
