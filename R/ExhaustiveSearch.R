@@ -1,37 +1,30 @@
 
 
-
-
+#' @export
 ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
   nResults = NULL, nThreads = 4, allowHugeCalls = FALSE,
-  allowHugeStorage = FALSE) {
+  allowHugeStorage = FALSE, quietly = FALSE) {
 
   formula = formula(formula)
   if (!inherits(formula, "formula")) stop("Error: Invalid formula.")
 
   ## Extract the design matrix with dims, response vector and feature names
   X = stats::model.matrix(formula, data)
-  XRows = nrow(X)
-  XCols = ncol(X)
   feats = colnames(X)[!colnames(X) == "(Intercept)"]
-  y = model.response(model.frame(formula, data))
-
-  ## Format X and y for the C++ function input
-  XInput = c(t(X))
-  yInput = as.numeric(y)
+  y = as.numeric(model.response(model.frame(formula, data)))
 
   ## Check if the family parameter was set correctly
   if (is.null(family)) {
-    family = ifelse(length(unique(yInput)) == 2, "binomial", "gaussian")
+    family = ifelse(length(unique(y)) == 2, "binomial", "gaussian")
     warning(paste0("Warning: family not specified! From the given response ",
       "data, I assume '", family, "' and continue."))
   } else if (family == "gaussian") {
-    if (length(unique(yInput)) == 2) {
+    if (length(unique(y)) == 2) {
       warning(paste0("Warning: You set family to 'gaussian', but the response ",
         "appears to be binary, are you sure this is intended?"))
     }
   } else if (family == "gaussian") {
-    if (length(unique(yInput)) != 2) {
+    if (length(unique(y)) != 2) {
       stop(paste0("Error: You set family to 'binomial', but the response is ",
         "not binary."))
     }
@@ -65,16 +58,17 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
       " the function call."))
   }
 
+  if (!quietly) cat("\nStarting the exhaustive evaluation.\n\n")
 
   ## The main C++ function call
   cppOutput = ExhaustiveSearchCpp(
-    XInput = XInput,
-    yInput = yInput,
-    XRows =  XRows,
-    XCols =  XCols,
+    XInput = X,
+    yInput = y,
+    family = family,
     combsUpTo = combsUpTo,
     nResults = nResults,
-    nThreads = nThreads)
+    nThreads = nThreads,
+    quietly = quietly)
 
   if (length(cppOutput) == 0) stop("User interrupt or internal error.")
 
@@ -88,8 +82,12 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
   result$ranking = list(aic = cppOutput[[3]], featureIDs = cppOutput[[4]])
   result$featureNames = feats
   result$batchSizes = cppOutput[[5]]
-  result$setup = list(family = family, combsUpTo = combsUpTo,
-    nResults = nResults, nThreads = nThreads)
+  result$setup = list(call = match.call(), family = family,
+    combsUpTo = combsUpTo, nResults = nResults, nThreads = nThreads)
+  result$TEST = cppOutput[[6]]
+  result$TEST2 = cppOutput[[7]]
+
+  if (!quietly) cat("\nEvaluation finished successfully.\n")
 
   return(result)
 }

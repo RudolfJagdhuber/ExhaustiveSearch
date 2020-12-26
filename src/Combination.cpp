@@ -3,7 +3,7 @@
 
 
 // A simple function to compute N over k
-size_t computeCombinations(ushort N, ushort k){
+size_t computeCombinations(uint N, uint k){
     // If k is larger than N-k its easier to use N-k for the computation
     unsigned short K = k > N / 2 ? N - k : k;
     unsigned long ncombs = 1;
@@ -15,12 +15,12 @@ size_t computeCombinations(ushort N, ushort k){
 }
 
 
-Combination::Combination(ushort N, ushort k, ushort nBatches) :
+Combination::Combination(uint N, uint k, uint nBatches) :
     m_N(N), m_k(k), m_nBatches(nBatches) {
 
     // Define initial value for current combination (1, 2, 3, ...)
     m_currentCombination.reserve(m_k);
-    for (ushort i = 1; i <= m_k; i++) m_currentCombination.push_back(i);
+    for (uint i = 1; i <= m_k; i++) m_currentCombination.push_back(i);
 
     // Compute the total number of existing combinations with this setup.
     m_nCombinations = computeCombinations(m_N, m_k);
@@ -29,11 +29,11 @@ Combination::Combination(ushort N, ushort k, ushort nBatches) :
     // The following computes a set of starting combinations that split all
     // combinations into m_nBatches approx equal parts (a vector of vectors)
     float targetSize = m_nCombinations / m_nBatches;
-    std::vector<ushort> element;
+    std::vector<uint> element;
     // First limit is 1, 2, 3, ...
     for (size_t i = 1; i <= m_k; i++) element.emplace_back(i);
     m_batchLimits.emplace_back(element);
-    ushort firstNum = 0;
+    uint firstNum = 0;
     for (size_t j = 0; j < m_nBatches; j++) {
         // Search for next start num to make the batch size at least targetsize
         size_t curBatchSize = 0;
@@ -73,7 +73,7 @@ bool Combination::nextCombination() {
 
     // We increment at pivot and set the following positions accordingly
     ++m_currentCombination[pivot];
-    for (ushort i = pivot + 1; i < m_k; ++i)
+    for (uint i = pivot + 1; i < m_k; ++i)
         m_currentCombination[i] = m_currentCombination[pivot] + i - pivot;
 
     return true;

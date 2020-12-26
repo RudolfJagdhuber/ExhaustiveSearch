@@ -10,8 +10,8 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    Rcpp
-LinkingTo: Rcpp
+    Rcpp, RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.1
 URL: https://github.com/RudolfJagdhuber/ExhaustiveSearch
 BugReports: https://github.com/RudolfJagdhuber/ExhaustiveSearch/issues

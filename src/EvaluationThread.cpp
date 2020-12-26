@@ -3,8 +3,8 @@
 
 std::mutex m;
 
-ranking ExhaustiveThread(size_t threadID, LogisticRegression Model,
-  Combination Comb, size_t nResults, StatusLog* SLptr) {
+ranking ExhaustiveThread(size_t threadID, GLM Model, Combination Comb,
+  size_t nResults, StatusLog* SLptr, bool quietly) {
 
   // Store results into a priority queue of pairs (AIC, combination), which is
   // ordered by the first element desc. (The worst is first in the queue).
@@ -29,10 +29,10 @@ ranking ExhaustiveThread(size_t threadID, LogisticRegression Model,
     }
 
     // Update the StatusLog object
-    if (iteration % 2000 == 0) {
+    if (iteration % 1000 == 0) {
       m.lock();
-      (*SLptr).addIters(2000);
-      if ((*SLptr).getCurIters() % 10000 == 0)
+      (*SLptr).addIters(1000);
+      if ((*SLptr).getCurIters() % 10000 == 0 && !quietly)
         Rcpp::Rcout << (*SLptr).status() << std::endl;
       m.unlock();
     }
