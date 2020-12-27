@@ -33,10 +33,13 @@ Rcpp::List ExhaustiveSearchCpp(
 
   // TEST
   Model.setFeatureCombination(std::vector<uint>{0, 1, 2, 3});
-  //arma::colvec coef = arma::solve(Model.getX(), Model.getY());
-  arma::colvec ay = Model.getY();
   arma::mat aX = Model.getX();
-  arma::mat betas = (aX.t() * aX).i() * aX.t() * ay;
+  arma::mat betas = (aX.t() * aX).i() * aX.t() * Model.getY();
+  arma::mat eps = Model.getY() - aX * betas;
+  arma::mat s2 = (eps.t() * eps) / (aX.n_rows - betas.n_rows);
+  arma::mat nll = 1;
+
+
 
   // Initialize the status logging Object and print the header
   StatusLog* SL =  new StatusLog(Comb.getNCombinations());
@@ -94,8 +97,8 @@ Rcpp::List ExhaustiveSearchCpp(
   result.push_back(AicList);
   result.push_back(CombList);
   result.push_back(Comb.getBatchSizes());
-  result.push_back(betas);
-  result.push_back(aX);
+  result.push_back(eps);
+  result.push_back(s2);
 
 
   return result;
