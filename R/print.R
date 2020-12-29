@@ -21,6 +21,6 @@ print.ExhaustiveSearch = function(x) {
   cat("\n+---------------------------------+")
   cat("\n|        Top Feature Sets         |")
   cat("\n+---------------------------------+\n")
-  cat(paste(capture.output(resultTable(x, 5)), collapse = "\n"), "\n\n")
+  cat(paste(capture.output(resultTable(x, 5, "  ")), collapse = "\n"), "\n\n")
 }
 

@@ -12,6 +12,9 @@ ranking ExhaustiveThread(size_t threadID, GLM Model, Combination Comb,
   ranking result;
 
   size_t iteration = 1;
+  size_t printAfter  = (Model.getFamily() == "gaussian") ? 500000 : 10000;
+  size_t updateAfter = (Model.getFamily() == "gaussian") ? 50000  : 1000;
+
   do {
 
     // Compute the Model for the current combination
@@ -29,10 +32,10 @@ ranking ExhaustiveThread(size_t threadID, GLM Model, Combination Comb,
     }
 
     // Update the StatusLog object
-    if (iteration % 1000 == 0) {
+    if (iteration % updateAfter == 0) {
       m.lock();
-      (*SLptr).addIters(1000);
-      if ((*SLptr).getCurIters() % 10000 == 0 && !quietly)
+      (*SLptr).addIters(updateAfter);
+      if ((*SLptr).getCurIters() % printAfter == 0 && !quietly)
         Rcpp::Rcout << (*SLptr).status() << std::endl;
       m.unlock();
     }

@@ -10,8 +10,8 @@
 // A Combination object holds the task to iterate over all possible combinations
 // for a given N and k. It starts from the first combination and has a function
 // to compute the next combination from it.
-class Combination
-{
+class Combination {
+
 	uint m_N;
 	uint m_k;
 	std::vector<uint> m_currentCombination;

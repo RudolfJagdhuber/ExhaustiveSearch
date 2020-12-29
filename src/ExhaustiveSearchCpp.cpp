@@ -10,15 +10,15 @@
 #include "StatusLog.h"
 
 
-
 // [[Rcpp::export]]
 Rcpp::List ExhaustiveSearchCpp(
-    Rcpp::NumericMatrix& XInput, // Design Matrix (with intercept column!)
+    arma::mat& XInput, // Design Matrix (with intercept column!)
     std::vector<double>& yInput,
     std::string family,
     size_t combsUpTo,
     size_t nResults,
     size_t nThreads,
+    double errorVal,
     bool quietly) {
   Rcpp::List result;
 
@@ -26,20 +26,10 @@ Rcpp::List ExhaustiveSearchCpp(
   DataSet Data(XInput, yInput);
 
   // Initialize the Logistic Regression Object (not fitted and not subsetted)
-  GLM Model(Data, family);
+  GLM Model(Data, family, errorVal);
 
   // Initialize the Combination Object (first column represents the intercept)
-  Combination Comb(XInput.ncol() - 1, combsUpTo, nThreads);
-
-  // TEST
-  Model.setFeatureCombination(std::vector<uint>{0, 1, 2, 3});
-  arma::mat aX = Model.getX();
-  arma::mat betas = (aX.t() * aX).i() * aX.t() * Model.getY();
-  arma::mat eps = Model.getY() - aX * betas;
-  arma::mat s2 = (eps.t() * eps) / (aX.n_rows - betas.n_rows);
-  arma::mat nll = 1;
-
-
+  Combination Comb(XInput.n_cols - 1, combsUpTo, nThreads);
 
   // Initialize the status logging Object and print the header
   StatusLog* SL =  new StatusLog(Comb.getNCombinations());
@@ -89,16 +79,12 @@ Rcpp::List ExhaustiveSearchCpp(
     finaltop.pop();
   }
 
-
-
   // Filling up the return object
   result.push_back(Comb.getNCombinations());
   result.push_back((*SL).getTotalTimeSecs());
   result.push_back(AicList);
   result.push_back(CombList);
   result.push_back(Comb.getBatchSizes());
-  result.push_back(eps);
-  result.push_back(s2);
 
 
   return result;

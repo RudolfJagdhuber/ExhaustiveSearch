@@ -9,8 +9,6 @@
 #include "StatusLog.h"
 
 
-
-
 // This function does the main exhaustive execution.
 // Note that LogReg/Comb are copies, not references -> individual per thread!
 // Comb object includes the search range of this thread.

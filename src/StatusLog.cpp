@@ -15,10 +15,10 @@ std::string StatusLog::status() {
     std::chrono::high_resolution_clock::now() - m_start)).count();
 
 	// Format into (dd:hh:mm:ss)
-	ushort days = osec / 60 / 60 / 24;
-	ushort hour = (osec / 60 / 60) % 24;
-	ushort min = (osec / 60) % 60;
-	ushort sec = osec % 60;
+	uint days = osec / 60 / 60 / 24;
+	uint hour = (osec / 60 / 60) % 24;
+	uint min = (osec / 60) % 60;
+	uint sec = osec % 60;
 
 	// Build the final string output
 	std::stringstream ss;
@@ -27,7 +27,7 @@ std::string StatusLog::status() {
     << std::setw(2) << std::setfill('0') << min << "m "
     << std::setw(2) << std::setfill('0') << sec << "s  |  "
 	  << std::setw(m_dig) << m_curIters << "/" << m_totalIters << "  |  "
-   << (int)(100 * m_curIters / m_totalIters) << "%";
+   << (uint)(100 * m_curIters / m_totalIters) << "%";
 
 	return ss.str();
 }
@@ -50,8 +50,5 @@ std::string StatusLog::footer() {
 
   if (m_totalIters < 1000) return "";
 
-  ushort dig = m_totalIters > 0 ? (int)(log10((double)m_totalIters)) + 1 : 1;
-
-  return status() + '\n' + std::string(34 + 2 * dig, '-');
+  return status() + '\n' + std::string(34 + 2 * m_dig, '-');
 }
-

@@ -25,7 +25,6 @@ Combination::Combination(uint N, uint k, uint nBatches) :
     // Compute the total number of existing combinations with this setup.
     m_nCombinations = computeCombinations(m_N, m_k);
 
-
     // The following computes a set of starting combinations that split all
     // combinations into m_nBatches approx equal parts (a vector of vectors)
     float targetSize = m_nCombinations / m_nBatches;
@@ -48,9 +47,6 @@ Combination::Combination(uint N, uint k, uint nBatches) :
         // Also add the batch size to m_batchSizes
         m_batchSizes.emplace_back(curBatchSize);
     }
-
-
-
 }
 
 

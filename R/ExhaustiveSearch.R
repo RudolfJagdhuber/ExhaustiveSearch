@@ -2,8 +2,8 @@
 
 #' @export
 ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
-  nResults = NULL, nThreads = 4, allowHugeCalls = FALSE,
-  allowHugeStorage = FALSE, quietly = FALSE) {
+  nResults = NULL, nThreads = 4, errorVal = -1, allowHugeStorage = FALSE,
+  quietly = FALSE) {
 
   formula = formula(formula)
   if (!inherits(formula, "formula")) stop("Error: Invalid formula.")
@@ -37,16 +37,9 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
   }
   if (combsUpTo == Inf) combsUpTo = length(feats)
 
-  ## Safety-check if the user requests something huge
-  nCombs = sum(choose(length(feats), seq(combsUpTo)))
-  if (nCombs > 100000 * nThreads & !allowHugeCalls) {
-    stop(paste0("You are requesting a very large task of ", nCombs,
-      "models!\n\nPlease consider defining a suitable combsUpTo value.\n\n",
-      "If you want to continue anyway, set 'allowHugeCalls = TRUE' in the ",
-      "function call."))
-  }
 
   ## Check nResults parameter and safety-check if the user requests huge memory
+  nCombs = sum(choose(length(feats), seq(combsUpTo)))
   if (is.null(nResults)) nResults = nCombs
   if (!is.numeric(nResults) | length(nResults) != 1 | any(nResults <= 0)) {
     stop("Error: nResults needs to be a single numeric value > 0")
@@ -56,6 +49,18 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
       "large amount of memory!\n\nPlease consider setting nResults <= 100000.",
       "\n\nIf you want to continue anyway, set 'allowHugeStorage = TRUE' in ",
       " the function call."))
+  }
+
+  # Check nThreads parameter
+  if (is.null(nThreads)) stop("Error: nThreads parameter cannot be NULL")
+  if (!is.numeric(nThreads) | length(nThreads) != 1 | nThreads %% 1 != 0) {
+    stop("Error: nThreads needs to be a single integer value")
+  }
+
+  ## Check errorVal parameter
+  if (is.null(errorVal)) stop("Error: errorVal parameter cannot be NULL")
+  if (!is.numeric(errorVal) | length(errorVal) != 1) {
+    stop("Error: errorVal needs to be a single numeric value")
   }
 
   if (!quietly) cat("\nStarting the exhaustive evaluation.\n\n")
@@ -68,6 +73,7 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
     combsUpTo = combsUpTo,
     nResults = nResults,
     nThreads = nThreads,
+    errorVal = errorVal,
     quietly = quietly)
 
   if (length(cppOutput) == 0) stop("User interrupt or internal error.")
@@ -77,7 +83,6 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
   class(result) = "ExhaustiveSearch"
 
   result$nModels = nCombs
-  result$nModels2 = cppOutput[[1]]
   result$runtimeSec = cppOutput[[2]]
   result$ranking = list(aic = cppOutput[[3]], featureIDs = cppOutput[[4]])
   result$featureNames = feats
@@ -85,7 +90,6 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
   result$setup = list(call = match.call(), family = family,
     combsUpTo = combsUpTo, nResults = nResults, nThreads = nThreads)
   result$TEST = cppOutput[[6]]
-  result$TEST2 = cppOutput[[7]]
 
   if (!quietly) cat("\nEvaluation finished successfully.\n")
 

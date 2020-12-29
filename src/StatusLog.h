@@ -8,12 +8,14 @@
 
 #include "globals.h"
 
+
 class StatusLog {
+
 	size_t m_totalIters;
 	size_t m_curIters;
   std::chrono::time_point<std::chrono::high_resolution_clock> m_start;
   // The number of digits m_totalIters has (used for formatting)
-  ushort m_dig;
+  uint m_dig;
   size_t m_totalTimeSecs;
 
 public:
