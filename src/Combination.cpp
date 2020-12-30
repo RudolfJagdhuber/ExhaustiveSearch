@@ -3,24 +3,35 @@
 
 
 // A simple function to compute N over k
-size_t computeCombinations(uint N, uint k){
+size_t NoverK(uint N, uint k) {
+
+    if (k == 0) return 1;
+
     // If k is larger than N-k its easier to use N-k for the computation
-    unsigned short K = k > N / 2 ? N - k : k;
-    unsigned long ncombs = 1;
-    for (unsigned int i = 1; i <= K; i++) {
-        ncombs *= N - i + 1;
-        ncombs /= i;
+    uint K = k > N / 2 ? N - k : k;
+    size_t nCombs = 1;
+    for (uint i = 1; i <= K; i++) {
+        nCombs *= N - i + 1;
+        nCombs /= i;
     }
-    return ncombs;
+    return nCombs;
 }
 
 
-Combination::Combination(uint N, uint k, uint nBatches) :
+// Compute the number of combinations of up to k parameters
+size_t computeCombinations(uint N, uint k){
+
+    size_t nCombs = 0;
+    for (uint K = 1; K <= k; K++) nCombs += NoverK(N, K);
+    return nCombs;
+}
+
+
+Combination::Combination(uint N, uint k, size_t nBatches) :
     m_N(N), m_k(k), m_nBatches(nBatches) {
 
-    // Define initial value for current combination (1, 2, 3, ...)
-    m_currentCombination.reserve(m_k);
-    for (uint i = 1; i <= m_k; i++) m_currentCombination.push_back(i);
+    // Define initial value for current combination with is just "1"
+    m_currentCombination.push_back(1);
 
     // Compute the total number of existing combinations with this setup.
     m_nCombinations = computeCombinations(m_N, m_k);
@@ -28,22 +39,35 @@ Combination::Combination(uint N, uint k, uint nBatches) :
     // The following computes a set of starting combinations that split all
     // combinations into m_nBatches approx equal parts (a vector of vectors)
     float targetSize = m_nCombinations / m_nBatches;
-    std::vector<uint> element;
-    // First limit is 1, 2, 3, ...
-    for (size_t i = 1; i <= m_k; i++) element.emplace_back(i);
+
+    // Initial limit needs to be "(0)" as the evaluation calls nextCombination()
+    // as a first step, which thus results in the true first element "(1)"
+    std::vector<uint> element{0};
     m_batchLimits.emplace_back(element);
-    uint firstNum = 0;
+
+    // The current idea is to iteratively add all combs of k elements with a
+    // fixed first digit until the batch is approx of the intended size.
+    uint firstDigit = 0;
+    uint curK = 1;
     for (size_t j = 0; j < m_nBatches; j++) {
-        // Search for next start num to make the batch size at least targetsize
+
+        // Continue to add combs until the batch size is large enough
         size_t curBatchSize = 0;
-        while (curBatchSize < targetSize && firstNum < m_N - m_k + 1) {
-            firstNum++;
-            curBatchSize += computeCombinations(m_N - firstNum, m_k - 1);
+        while (curBatchSize < targetSize) {
+            if (firstDigit < m_N - curK + 1) firstDigit++;
+            else if (curK < m_k) {// Start with next larger set of combinations
+                curK++;
+                firstDigit = 1;
+            } else break; // Last combination reached, nothing more to add
+
+            curBatchSize += NoverK(m_N - firstDigit, curK - 1);
         }
-        // Found starting number. Now add it to result
+
+        // Found starting number firstDigit of a combination of curK. -> Add it
         element.clear();
-        for (size_t i = 0; i < m_k; i++) element.emplace_back(firstNum + i);
+        for (uint i = 0; i < curK; i++) element.emplace_back(firstDigit + i);
         m_batchLimits.emplace_back(element);
+
         // Also add the batch size to m_batchSizes
         m_batchSizes.emplace_back(curBatchSize);
     }
@@ -57,20 +81,32 @@ bool Combination::nextCombination() {
     // Have we reached the early stopping combination? Then do nothing.
     if (m_currentCombination == m_stopCombination) return false;
 
-    // We want to find the index of the least significant element
-    // in v that can be increased.  Let's call that index 'pivot'.
-    short pivot = m_k - 1;
-    while (pivot >= 0 && m_currentCombination[pivot] == m_N + 1 - m_k + pivot)
+    // Get the current length of the combination
+    uint k = m_currentCombination.size();
+
+    // We want to find the index of the rightmost element in
+    // m_currentCombination that can be increased.  We call its index 'pivot'.
+    int pivot = k - 1;
+    while (pivot >= 0 && m_currentCombination[pivot] == m_N + 1 - k + pivot)
         --pivot;
 
-    // pivot will be -1 if v == {N - k, N - k + 1, ..., N - 1},
-    // in which case, there is no next combination and we are done.
-    if (pivot == -1) return false;
+    // pivot will be -1 if the final combination of (N, k) is reached.
+    if (pivot == -1) {
+        // If we are at the max size of our analyzed combinations, we are done
+        if (k == m_k) return false;
+        else { // Otherwise set the first combination of k+1 elements
+            m_currentCombination.clear();
+            m_currentCombination.reserve(k + 1);
+            for (uint i = 1; i <= k + 1; i++) m_currentCombination.push_back(i);
+            return true;
+        }
+    } else {
+        // We increment at pivot and set the following positions accordingly
+        ++m_currentCombination[pivot];
+        for (uint i = pivot + 1; i < k; ++i)
+            m_currentCombination[i] = m_currentCombination[pivot] + i - pivot;
+        return true;
+    }
 
-    // We increment at pivot and set the following positions accordingly
-    ++m_currentCombination[pivot];
-    for (uint i = pivot + 1; i < m_k; ++i)
-        m_currentCombination[i] = m_currentCombination[pivot] + i - pivot;
 
-    return true;
 }

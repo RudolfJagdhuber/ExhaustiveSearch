@@ -7,26 +7,27 @@
 using namespace Rcpp;
 
 // ExhaustiveSearchCpp
-Rcpp::List ExhaustiveSearchCpp(arma::mat& XInput, std::vector<double>& yInput, std::string family, size_t combsUpTo, size_t nResults, size_t nThreads, double errorVal, bool quietly);
-RcppExport SEXP _ExhaustiveSearch_ExhaustiveSearchCpp(SEXP XInputSEXP, SEXP yInputSEXP, SEXP familySEXP, SEXP combsUpToSEXP, SEXP nResultsSEXP, SEXP nThreadsSEXP, SEXP errorValSEXP, SEXP quietlySEXP) {
+Rcpp::List ExhaustiveSearchCpp(arma::mat& XInput, std::vector<double>& yInput, std::string family, bool intercept, size_t combsUpTo, size_t nResults, size_t nThreads, double errorVal, bool quietly);
+RcppExport SEXP _ExhaustiveSearch_ExhaustiveSearchCpp(SEXP XInputSEXP, SEXP yInputSEXP, SEXP familySEXP, SEXP interceptSEXP, SEXP combsUpToSEXP, SEXP nResultsSEXP, SEXP nThreadsSEXP, SEXP errorValSEXP, SEXP quietlySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::mat& >::type XInput(XInputSEXP);
     Rcpp::traits::input_parameter< std::vector<double>& >::type yInput(yInputSEXP);
     Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
+    Rcpp::traits::input_parameter< bool >::type intercept(interceptSEXP);
     Rcpp::traits::input_parameter< size_t >::type combsUpTo(combsUpToSEXP);
     Rcpp::traits::input_parameter< size_t >::type nResults(nResultsSEXP);
     Rcpp::traits::input_parameter< size_t >::type nThreads(nThreadsSEXP);
     Rcpp::traits::input_parameter< double >::type errorVal(errorValSEXP);
     Rcpp::traits::input_parameter< bool >::type quietly(quietlySEXP);
-    rcpp_result_gen = Rcpp::wrap(ExhaustiveSearchCpp(XInput, yInput, family, combsUpTo, nResults, nThreads, errorVal, quietly));
+    rcpp_result_gen = Rcpp::wrap(ExhaustiveSearchCpp(XInput, yInput, family, intercept, combsUpTo, nResults, nThreads, errorVal, quietly));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_ExhaustiveSearch_ExhaustiveSearchCpp", (DL_FUNC) &_ExhaustiveSearch_ExhaustiveSearchCpp, 8},
+    {"_ExhaustiveSearch_ExhaustiveSearchCpp", (DL_FUNC) &_ExhaustiveSearch_ExhaustiveSearchCpp, 9},
     {NULL, NULL, 0}
 };
 

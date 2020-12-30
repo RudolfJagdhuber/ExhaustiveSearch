@@ -15,10 +15,11 @@ ranking ExhaustiveThread(size_t threadID, GLM Model, Combination Comb,
   size_t printAfter  = (Model.getFamily() == "gaussian") ? 500000 : 10000;
   size_t updateAfter = (Model.getFamily() == "gaussian") ? 50000  : 1000;
 
-  do {
+  // Step to the next combination and evaluate it, as long as there is one
+  while (Comb.nextCombination()) {
 
     // Compute the Model for the current combination
-    Model.setFeatureCombination(Comb.getCurrentCombWith0());
+    Model.setFeatureCombination(Comb.getCurrentComb());
     Model.fit();
 
     // Add this combination to our toplist if either there is room, or if it
@@ -41,7 +42,7 @@ ranking ExhaustiveThread(size_t threadID, GLM Model, Combination Comb,
     }
 
     iteration++;
-  } while (Comb.nextCombination()); // As long as there is a next combination
+  }
 
   return result;
 }

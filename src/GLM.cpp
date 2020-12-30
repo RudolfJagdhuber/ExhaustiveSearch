@@ -1,33 +1,21 @@
 
 #include "GLM.h"
 
-// Only define the data set for the Object, and update the feature combination
-// separately. This makes an exhaustive evaluation easier to implement.
-GLM::GLM(const DataSet& D, std::string family, double errorVal)
-  : m_D(D), m_family(family), m_errorVal(errorVal), m_nBeta(D.getX().n_cols),
-    m_negloglik(0) {
-
-  // Define initial feature subset (use all columns)
-  m_featureComb.reserve(D.getX().n_cols);
-  for (size_t i = 1; i <= D.getX().n_cols; i++) m_featureComb.push_back(i);
-
-  // Allocate and initialize the betas
-  m_beta = (double*) malloc(sizeof(double) * m_nBeta);
-  for (size_t i = 0; i < m_nBeta; i++) m_beta[i] = 0.0;
-}
-
 
 void GLM::setFeatureCombination(const std::vector<uint>& new_comb) {
 
-  // Set the new feature combination
-  m_featureComb = new_comb;
-  m_nBeta = m_featureComb.size();
-
-  // Allocate and initialize the betas
+  // Extract the size of the feature combination and allocate the betas
+  m_nBeta = new_comb.size() + (m_intercept ? 1 : 0);
   m_beta = (double*)malloc(sizeof(double) * m_nBeta);
   for (size_t i = 0; i < m_nBeta; i++) m_beta[i] = 0.0;
 
-  // Reset negative log-Likelihood
+  // Set the new feature combination
+  m_featureComb.clear();
+  m_featureComb.reserve(m_nBeta);
+  if (m_intercept) m_featureComb.push_back(0);
+  for (uint elem : new_comb) m_featureComb.push_back(elem);
+
+  // Reset the negative log-Likelihood
   m_negloglik = 0.0;
 }
 

@@ -10,7 +10,18 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
 
   ## Extract the design matrix with dims, response vector and feature names
   X = stats::model.matrix(formula, data)
-  feats = colnames(X)[!colnames(X) == "(Intercept)"]
+
+  ## Does the setup include an intercept
+  intercept = attr(terms(formula, data = data), "intercept") == 1
+
+  ## Features combinations are stored as 1, 2, 3,... in C++, 0 is reserved for
+  ## the intercept, which is the first columnof the DataSet (Data[,0]). To keep
+  ## the C++ subsetting via Column[,index] consistent for setups with and
+  ## without intercepts, an unused dummy column needs to be added at setups
+  ## without intercept. This makes Data[,i] always refer to the same feature i.
+  if (!intercept) X = cbind("NotUsed" = 0, X)
+
+  feats = colnames(X)[-1]
   y = as.numeric(model.response(model.frame(formula, data)))
 
   ## Check if the family parameter was set correctly
@@ -70,6 +81,7 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
     XInput = X,
     yInput = y,
     family = family,
+    intercept = intercept,
     combsUpTo = combsUpTo,
     nResults = nResults,
     nThreads = nThreads,
@@ -83,13 +95,13 @@ ExhaustiveSearch = function(formula, data, family = NULL, combsUpTo = NULL,
   class(result) = "ExhaustiveSearch"
 
   result$nModels = nCombs
-  result$runtimeSec = cppOutput[[2]]
-  result$ranking = list(aic = cppOutput[[3]], featureIDs = cppOutput[[4]])
+  result$runtimeSec = cppOutput[[1]]
+  result$ranking = list(aic = cppOutput[[2]], featureIDs = cppOutput[[3]])
   result$featureNames = feats
-  result$batchSizes = cppOutput[[5]]
+  result$batchSizes = cppOutput[[4]]
   result$setup = list(call = match.call(), family = family,
-    combsUpTo = combsUpTo, nResults = nResults, nThreads = nThreads)
-  result$TEST = cppOutput[[6]]
+    intercept = intercept, combsUpTo = combsUpTo, nResults = nResults,
+    nThreads = nThreads)
 
   if (!quietly) cat("\nEvaluation finished successfully.\n")
 

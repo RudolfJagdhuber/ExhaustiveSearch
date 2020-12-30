@@ -22,7 +22,7 @@ public:
 	StatusLog(size_t total) : m_totalIters(total), m_curIters(0),
 	  m_start(std::chrono::high_resolution_clock::now()),
 	  m_dig(m_totalIters > 0 ? (int)(log10((double)m_totalIters)) + 1 : 1),
-	  m_totalTimeSecs(0) {};
+	  m_totalTimeSecs(0) {}
   size_t getCurIters() {return m_curIters;}
   size_t getTotalTimeSecs() {return m_totalTimeSecs;}
   void addIters(size_t add) {	m_curIters += add; }

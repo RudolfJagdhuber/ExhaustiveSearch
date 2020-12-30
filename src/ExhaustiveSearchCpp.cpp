@@ -15,6 +15,7 @@ Rcpp::List ExhaustiveSearchCpp(
     arma::mat& XInput, // Design Matrix (with intercept column!)
     std::vector<double>& yInput,
     std::string family,
+    bool intercept,
     size_t combsUpTo,
     size_t nResults,
     size_t nThreads,
@@ -26,9 +27,9 @@ Rcpp::List ExhaustiveSearchCpp(
   DataSet Data(XInput, yInput);
 
   // Initialize the Logistic Regression Object (not fitted and not subsetted)
-  GLM Model(Data, family, errorVal);
+  GLM Model(Data, family, intercept, errorVal);
 
-  // Initialize the Combination Object (first column represents the intercept)
+  // Initialize the Combination Object (first column reserved for the intercept)
   Combination Comb(XInput.n_cols - 1, combsUpTo, nThreads);
 
   // Initialize the status logging Object and print the header
@@ -80,7 +81,6 @@ Rcpp::List ExhaustiveSearchCpp(
   }
 
   // Filling up the return object
-  result.push_back(Comb.getNCombinations());
   result.push_back((*SL).getTotalTimeSecs());
   result.push_back(AicList);
   result.push_back(CombList);
