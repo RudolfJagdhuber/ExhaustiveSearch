@@ -12,8 +12,8 @@
 
 // [[Rcpp::export]]
 Rcpp::List ExhaustiveSearchCpp(
-    arma::mat& XInput, // Design Matrix (with intercept column!)
-    std::vector<double>& yInput,
+    const arma::mat& XInput, // Design Matrix (with intercept column!)
+    const std::vector<double>& yInput,
     std::string family,
     bool intercept,
     size_t combsUpTo,
@@ -80,12 +80,12 @@ Rcpp::List ExhaustiveSearchCpp(
     finaltop.pop();
   }
 
+
   // Filling up the return object
   result.push_back((*SL).getTotalTimeSecs());
   result.push_back(AicList);
   result.push_back(CombList);
   result.push_back(Comb.getBatchSizes());
-
 
   return result;
 }

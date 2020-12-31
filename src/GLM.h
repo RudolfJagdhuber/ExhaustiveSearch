@@ -12,7 +12,7 @@
 class GLM {
 
 protected:
-  DataSet m_D;
+  const DataSet& m_D;
   std::vector<uint> m_featureComb;
   std::string m_family;
   bool m_intercept;
@@ -29,9 +29,9 @@ public:
       m_nBeta(D.getX().n_cols), m_negloglik(0) {}
   std::string getFamily() { return m_family;};
   bool hasIntercept() { return m_intercept; }
-  arma::mat getX() { return m_D.getX().cols(arma::Col<uint>(m_featureComb)); }
-  arma::colvec getY() { return arma::colvec(m_D.getY()); }
-  double getNegLogLik() { return m_negloglik; }
+  arma::mat getXsubset() {
+    return m_D.getX().cols(arma::Col<uint>(m_featureComb));
+  }
   float getAIC() {
     if (m_negloglik == m_errorVal) return m_errorVal;
     else return 2 * ((float) m_negloglik + m_nBeta +
@@ -43,13 +43,13 @@ public:
   int computeOLS();
   // Logistic Regression
   // The target function to be optimized in the form that lbfgs takes it
-  static double _evalLogReg(void* instance, const double* beta, double* g,
+  static double _evalLogReg(void* instance, const double* betaPtr, double* g,
     const int n, const double step)	{
-    return reinterpret_cast<GLM*>(instance)->evalLogReg(beta, g, n, step);
+    return reinterpret_cast<GLM*>(instance)->evalLogReg(betaPtr, g, n, step);
   }
   // The main lbfgs function. Sets the gradient values at pointer.
   // Returns target function value.
-  double evalLogReg(const double *beta, double *g, const size_t n,
+  double evalLogReg(const double *betaPtr, double *g, const size_t n,
     const double step);
 
 };

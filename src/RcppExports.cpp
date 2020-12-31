@@ -7,13 +7,13 @@
 using namespace Rcpp;
 
 // ExhaustiveSearchCpp
-Rcpp::List ExhaustiveSearchCpp(arma::mat& XInput, std::vector<double>& yInput, std::string family, bool intercept, size_t combsUpTo, size_t nResults, size_t nThreads, double errorVal, bool quietly);
+Rcpp::List ExhaustiveSearchCpp(const arma::mat& XInput, const std::vector<double>& yInput, std::string family, bool intercept, size_t combsUpTo, size_t nResults, size_t nThreads, double errorVal, bool quietly);
 RcppExport SEXP _ExhaustiveSearch_ExhaustiveSearchCpp(SEXP XInputSEXP, SEXP yInputSEXP, SEXP familySEXP, SEXP interceptSEXP, SEXP combsUpToSEXP, SEXP nResultsSEXP, SEXP nThreadsSEXP, SEXP errorValSEXP, SEXP quietlySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat& >::type XInput(XInputSEXP);
-    Rcpp::traits::input_parameter< std::vector<double>& >::type yInput(yInputSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type XInput(XInputSEXP);
+    Rcpp::traits::input_parameter< const std::vector<double>& >::type yInput(yInputSEXP);
     Rcpp::traits::input_parameter< std::string >::type family(familySEXP);
     Rcpp::traits::input_parameter< bool >::type intercept(interceptSEXP);
     Rcpp::traits::input_parameter< size_t >::type combsUpTo(combsUpToSEXP);
