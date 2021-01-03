@@ -12,17 +12,24 @@ formatSecTime = function(sec) {
 
 #' @export
 print.ExhaustiveSearch = function(x) {
-  cat("\n+---------------------------------+")
-  cat("\n|    Exhaustive Search Results    |")
-  cat("\n+---------------------------------+\n")
+
+  evalOn = ifelse(x$setup$nTest == 0,
+    paste0("Training Set (n = ", format(x$setup$nTrain, big.mark = ","), ")\n"),
+    paste0("Test Set (n = ", format(x$setup$nTest, big.mark = ","), ")\n"))
+
+  cat("\n+-----------------------------------------------+")
+  cat("\n|           Exhaustive Search Results           |")
+  cat("\n+-----------------------------------------------+\n")
   cat("Model family:      ", x$setup$family, "\n")
   cat("Intercept:         ", x$setup$intercept, "\n")
-  cat("Models evaluated:  ", format(x$nModels, big.mark = ","), "\n")
+  cat("Perf. Measure:     ", RES$setup$performanceMeasure, "\n")
+  cat("Evaluated on:      ", evalOn)
+  cat("Models evaluated:  ", format(x$nModels, big.mark = ","),
+    ifelse(x$evaluatedModels != x$nModels, " (Incomplete!)", ""), "\n")
   cat("Models saved:      ", format(x$setup$nResults, big.mark = ","), "\n")
   cat("Total runtime:     ", formatSecTime(x$runtimeSec), "\n")
-  cat("\n+---------------------------------+")
-  cat("\n|        Top Feature Sets         |")
-  cat("\n+---------------------------------+\n")
+  cat("\n+-----------------------------------------------+")
+  cat("\n|               Top Feature Sets                |")
+  cat("\n+-----------------------------------------------+\n")
   cat(paste(capture.output(resultTable(x, 5, "  ")), collapse = "\n"), "\n\n")
 }
-

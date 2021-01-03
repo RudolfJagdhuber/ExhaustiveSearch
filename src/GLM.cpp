@@ -22,8 +22,7 @@ void GLM::setFeatureCombination(const std::vector<uint>& new_comb) {
 
 void GLM::fit() {
 
-  if (m_beta == nullptr) return;
-  int ret = 1;
+  int ret = 0;
   if (m_family == "gaussian") {
     // Use simple matrix algebra for optimization
     ret = computeOLS();
@@ -31,27 +30,63 @@ void GLM::fit() {
     // Execute the LBFGS optimizer and compute the betas
     lbfgs_parameter_t param;
     lbfgs_parameter_init(&param);
-    ret = lbfgs(m_nBeta, m_beta, &m_negloglik, _evalLogReg, NULL, this, &param);
+    ret = lbfgs(m_nBeta, m_beta, &m_negloglik, _evalLogReg, NULL, this,
+      &param);
+
+    // Lbfgs has many error codes (negative ret), which are not all real errors.
+    // Unfortunately, I do not know which are still OK, so I assume, that if the
+    // likelihood was set, it is somewhat acceptable (-> room for improvement).
+    if (ret < 0 && m_negloglik !=0) ret = 123;
   }
   // Model could not be fitted
-  if (ret == 1) m_negloglik = m_errorVal;
+  if (ret < 0) m_negloglik = m_errorVal;
+}
+
+
+double GLM::getMSE() {
+
+  // Model could not be fitted
+  if (m_negloglik == m_errorVal) return m_errorVal;
+
+  // double!! because otherwise (2/n -> 0), which has cost me hours to find...
+  double n = (*m_D.XTest).n_rows;
+
+  // shortcut for gaussian training set mse
+  if (m_D.noTestSet() && m_family == "gaussian")
+    return exp(2/n * m_negloglik - 1) / (2 * M_PI);
+
+  double sse = 0;
+  double eta, yHat;
+  for (size_t i = 0; i < (*m_D.XTest).n_rows; i++) {
+    eta = 0;
+    for (size_t j = 0; j < m_nBeta; j++)
+      eta += (*m_D.XTest)(i, m_featureComb[j]) * m_beta[j];
+
+    if (m_family == "gaussian") yHat = eta;
+    else if (m_family == "binomial") yHat = 1.0 / (1.0 + exp(-eta));
+    else return m_errorVal;
+
+    sse += pow((*m_D.yTest)[i] - yHat, 2);
+  }
+  return sse / n;
 }
 
 
 int GLM::computeOLS() {
 
   arma::vec beta;
-  const arma::mat& X = getXsubset();
-  const arma::vec& y = arma::vec(m_D.getY());
+  arma::mat X = getXTrainSubset();
+  arma::vec y = arma::vec(*m_D.yTrain);
 
   // Use the standard OLS formula to compute the regression coefficients
   bool success = arma::solve(beta, X, y);
   if (success) {
+    for (size_t i = 0; i < m_nBeta; i++) m_beta[i] = beta[i];
     double sse = arma::as_scalar((y - X * beta).t() * (y - X * beta));
     double n = y.n_rows;
     m_negloglik = n/2 * (log(2 * M_PI * sse / n) + 1);
     return 0;
-  } else return 1;
+  } else return -1;
 }
 
 
@@ -64,15 +99,16 @@ int GLM::computeOLS() {
 double GLM::evalLogReg(const double* betaPtr, double* g, const size_t n,
   const double step) {
 
-  const arma::mat& X = m_D.getX();
-  const std::vector<double>& y = m_D.getY();
+  // References for shorter code and better readability
+  const arma::mat& X = *m_D.XTrain;
+  const std::vector<double>& y = *m_D.yTrain;
 
   // reset space of gradient vector
   memset(g, 0, sizeof(double) * n);
 
   // Iterate over observations i and sum up the negative log-likelihoods
   double nll = 0.0;
-  for (size_t i = 0; i < y.size(); i++) {
+  for (size_t i = 0; i < X.n_rows; i++) {
 
     // Iterate over data columns to compute eta_i = x_i %*% beta
     double eta_i = 0.0;
@@ -104,15 +140,14 @@ double GLM::evalLogReg(const double* betaPtr, double* g, const size_t n,
 
 
 
-//// arma version of LogReg is 2.5x slower (I suspect data copies)
-//
+// // arma version of LogReg is > 2.5x slower (I suspect data copies)
 // double GLM::evalLogReg(const double* betaPtr, double* g, const size_t n,
 //   const double step) {
 //
 //   // create arma::vec from the memory address of the optimized betas
 //   arma::vec beta(betaPtr, m_nBeta);
-//   const arma::mat& X = getX();
-//   const arma::vec& y = getY();
+//   const arma::mat& X = (*m_D.XTrain).cols(arma::Col<uint>(m_featureComb));
+//   const arma::vec& y = arma::vec(*m_D.yTrain);
 //
 //   // Compute the vector of predictions
 //   arma::vec yHat = 1.0 / (1.0 + exp(-(X * beta)));
@@ -129,6 +164,3 @@ double GLM::evalLogReg(const double* betaPtr, double* g, const size_t n,
 //   // Compute and return the negative log likelihood
 //   return -arma::as_scalar(y.t() * log(yHat) + (1 - y).t() * log(1 - yHat));
 // }
-
-
-

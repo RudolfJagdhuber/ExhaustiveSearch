@@ -4,4 +4,4 @@
 
 
 typedef unsigned int  uint;
-typedef std::priority_queue<std::pair<float, std::vector<uint>>> ranking;
+typedef std::priority_queue<std::pair<double, std::vector<uint>>> ranking;

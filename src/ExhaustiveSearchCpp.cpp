@@ -14,40 +14,62 @@
 Rcpp::List ExhaustiveSearchCpp(
     const arma::mat& XInput, // Design Matrix (with intercept column!)
     const std::vector<double>& yInput,
+    const arma::mat& XTestSet,
+    const std::vector<double>& yTestSet,
     std::string family,
+    std::string performanceMeasure,
     bool intercept,
     size_t combsUpTo,
     size_t nResults,
     size_t nThreads,
     double errorVal,
     bool quietly) {
-  Rcpp::List result;
 
-  // Take the given Data and create a custom object (DataSet.h) from it
-  DataSet Data(XInput, yInput);
+  // The data shall not be copied from now on, so only work with pointers stored
+  // in a DataSet object (DataSet.h) for structure.
+  // If a TestSet is specified use it, otherwise repeat the training data ptr
+  const arma::mat * X = &XInput;
+  const std::vector<double> * y = &yInput;
+  const arma::mat * XT = &XTestSet;
+  const std::vector<double> * yT = &yTestSet;
+  bool hasTestSet = XTestSet.n_rows > 0;
+  DataSet Data(X, y, hasTestSet ? XT : X, hasTestSet ? yT : y);
 
   // Initialize the Logistic Regression Object (not fitted and not subsetted)
-  GLM Model(Data, family, intercept, errorVal);
+  GLM Model(Data, family, performanceMeasure, intercept, errorVal);
 
-  // Initialize the Combination Object (first column reserved for the intercept)
+  // set nThreads to the number of CPUs if it was not set by the user
+  if (nThreads == 0) nThreads = std::thread::hardware_concurrency();
+
+  // Initialize the Combination Object (ncols - 1 because of the Intercept col)
   Combination Comb(XInput.n_cols - 1, combsUpTo, nThreads);
 
   // Initialize the status logging Object and print the header
   StatusLog* SL =  new StatusLog(Comb.getNCombinations());
   if (!quietly) Rcpp::Rcout << (*SL).header() << std::endl;;
 
-  // Create the threads with their respective batches of combinations
+  // Create threads that each define a ranking object as future. I avoid the
+  // simpler std::async to use RcppThread::Thread for interrupt management.
   std::vector<std::future<ranking>> futures;
+  // std::vector<RcppThread::Thread> threads;
+  std::vector<std::thread> threads;
   for (size_t i = 0; i < nThreads; i++) {
     Comb.setCurrentComb(Comb.getBatchLimits()[i]);
     Comb.setStopComb(Comb.getBatchLimits()[i + 1]);
-    futures.push_back(std::async(&ExhaustiveThread, i + 1, Model, Comb,
-      nResults, SL, quietly));
+    std::promise<ranking> p;
+    futures.push_back(p.get_future());
+    threads.push_back(std::thread(&ExhaustiveThread, i + 1,
+      Model, Comb, nResults, SL, quietly, std::move(p)));
   }
 
-  // Collect all std::future objects (i.e. wait for threads to finish)
+  // Join threads and collect all std::future objects
   std::vector<ranking> allres;
-  for (size_t i = 0; i < nThreads; i++) allres.push_back(futures[i].get());
+  for (size_t i = 0; i < nThreads; i++) {
+    threads[i].join();
+    allres.push_back(futures[i].get());
+  }
+
+  size_t evaluatedModels = (*SL).getCurIters();
 
   // Finalize the StatusLog object and print the footer of the table
   (*SL).finalize();
@@ -81,11 +103,12 @@ Rcpp::List ExhaustiveSearchCpp(
   }
 
 
-  // Filling up the return object
+  // Filling up the result object
+  Rcpp::List result;
   result.push_back((*SL).getTotalTimeSecs());
   result.push_back(AicList);
   result.push_back(CombList);
-  result.push_back(Comb.getBatchSizes());
+  result.push_back(evaluatedModels);
 
   return result;
 }

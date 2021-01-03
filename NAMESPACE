@@ -2,6 +2,7 @@
 
 S3method(print,ExhaustiveSearch)
 export(ExhaustiveSearch)
+export(getFeatures)
 export(resultTable)
 importFrom(Rcpp,sourceCpp)
 useDynLib(ExhaustiveSearch, .registration = TRUE)

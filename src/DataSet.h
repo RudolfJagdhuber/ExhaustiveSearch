@@ -2,16 +2,17 @@
 
 #include "globals.h"
 
-// A simple and sparse class to hold all data information (response and feature
-// matrix). The features are stored as a double vector with known dimensions.
-class DataSet {
+// A simple struct to hold pointers to a training/testing data set combination
+struct DataSet {
 
-    const arma::mat& m_X;
-    const std::vector<double>& m_y;
+    const arma::mat * XTrain;
+    const std::vector<double> * yTrain;
+    const arma::mat * XTest;
+    const std::vector<double> * yTest;
 
-public:
-    DataSet(const arma::mat& X, const std::vector<double>& y)
-    : m_X(X), m_y(y) {}
-    const arma::mat& getX() const { return m_X;}
-    const std::vector<double>& getY() const { return m_y; }
+    DataSet(const arma::mat*& XTrain, const std::vector<double>*& yTrain,
+        const arma::mat*& XTest, const std::vector<double>*& yTest)
+    : XTrain(XTrain), yTrain(yTrain), XTest(XTest), yTest(yTest) {}
+
+    bool noTestSet() { return XTrain == XTest && yTrain == yTest; }
 };

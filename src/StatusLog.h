@@ -27,7 +27,6 @@ public:
   size_t getTotalTimeSecs() {return m_totalTimeSecs;}
   void addIters(size_t add) {	m_curIters += add; }
   void finalize() {
-    m_curIters = m_totalIters;
     m_totalTimeSecs = (size_t)((std::chrono::duration<float>)(
       std::chrono::high_resolution_clock::now() - m_start)).count();
   }
