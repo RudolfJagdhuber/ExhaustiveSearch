@@ -47,10 +47,10 @@ public:
   // Multiple Linear Regression functions:
   // This makes copies, but I need to use matrix algebra on subsets for OLS
   arma::mat getXTrainSubset() {
-    return (*m_D.XTrain).cols(arma::Col<uint>(m_featureComb));
+    return m_D.XTrain->cols(arma::Col<uint>(m_featureComb));
   }
   arma::mat getXTestSubset() {
-    return (*m_D.XTrain).cols(arma::Col<uint>(m_featureComb));
+    return m_D.XTrain->cols(arma::Col<uint>(m_featureComb));
   }
   int computeOLS();
 

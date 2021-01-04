@@ -39,16 +39,16 @@ void ExhaustiveThread(size_t threadID, GLM Model, Combination Comb,
     // Update the StatusLog object
     if (iteration % updateAfter == 0) {
       m.lock();
-      (*SLptr).addIters(updateAfter);
-      if ((*SLptr).getCurIters() % printAfter == 0 && !quietly)
-        Rcpp::Rcout << (*SLptr).status() << std::endl;
+      SLptr->addIters(updateAfter);
+      if (SLptr->getCurIters() % printAfter == 0 && !quietly)
+        Rcpp::Rcout << SLptr->status() << std::endl;
       m.unlock();
     }
   }
 
   // Final update of StatusLog Object
   m.lock();
-  (*SLptr).addIters(iteration % updateAfter);
+  SLptr->addIters(iteration % updateAfter);
   m.unlock();
 
   p.set_value(result);

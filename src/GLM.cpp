@@ -49,7 +49,7 @@ double GLM::getMSE() {
   if (m_negloglik == m_errorVal) return m_errorVal;
 
   // double!! because otherwise (2/n -> 0), which has cost me hours to find...
-  double n = (*m_D.XTest).n_rows;
+  double n = m_D.XTest->n_rows;
 
   // shortcut for gaussian training set mse
   if (m_D.noTestSet() && m_family == "gaussian")
@@ -57,7 +57,7 @@ double GLM::getMSE() {
 
   double sse = 0;
   double eta, yHat;
-  for (size_t i = 0; i < (*m_D.XTest).n_rows; i++) {
+  for (size_t i = 0; i < n; i++) {
     eta = 0;
     for (size_t j = 0; j < m_nBeta; j++)
       eta += (*m_D.XTest)(i, m_featureComb[j]) * m_beta[j];
@@ -146,7 +146,7 @@ double GLM::evalLogReg(const double* betaPtr, double* g, const size_t n,
 //
 //   // create arma::vec from the memory address of the optimized betas
 //   arma::vec beta(betaPtr, m_nBeta);
-//   const arma::mat& X = (*m_D.XTrain).cols(arma::Col<uint>(m_featureComb));
+//   const arma::mat& X = m_D.XTrain->cols(arma::Col<uint>(m_featureComb));
 //   const arma::vec& y = arma::vec(*m_D.yTrain);
 //
 //   // Compute the vector of predictions

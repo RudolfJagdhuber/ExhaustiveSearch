@@ -46,7 +46,7 @@ Rcpp::List ExhaustiveSearchCpp(
 
   // Initialize the status logging Object and print the header
   StatusLog* SL =  new StatusLog(Comb.getNCombinations());
-  if (!quietly) Rcpp::Rcout << (*SL).header() << std::endl;;
+  if (!quietly) Rcpp::Rcout << SL->header() << std::endl;;
 
   // Create threads that each define a ranking object as future. I avoid the
   // simpler std::async to use RcppThread::Thread for interrupt management.
@@ -70,9 +70,9 @@ Rcpp::List ExhaustiveSearchCpp(
   }
 
   // Finalize the StatusLog object and print the footer of the table
-  size_t evaluatedModels = (*SL).getCurIters();
-  (*SL).finalize();
-  if (!quietly) Rcpp::Rcout << (*SL).footer() << std::endl;;
+  size_t evaluatedModels = SL->getCurIters();
+  SL->finalize();
+  if (!quietly) Rcpp::Rcout << SL->footer() << std::endl;;
 
   // If I cut off the ranking in a single thread, I can no longer guarantee
   // that there is no nearly similar performing subsequent model. Therefore all
@@ -103,7 +103,7 @@ Rcpp::List ExhaustiveSearchCpp(
 
   // Filling up the result object
   Rcpp::List result;
-  result.push_back((*SL).getTotalTimeSecs());
+  result.push_back(SL->getTotalTimeSecs());
   result.push_back(AicList);
   result.push_back(CombList);
   result.push_back(evaluatedModels);
