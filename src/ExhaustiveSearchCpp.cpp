@@ -38,8 +38,8 @@ Rcpp::List ExhaustiveSearchCpp(
   // Initialize the Logistic Regression Object (not fitted and not subsetted)
   GLM Model(Data, family, performanceMeasure, intercept, errorVal);
 
-  // set nThreads to the number of CPUs if it was not set by the user
-  if (nThreads == 0) nThreads = std::thread::hardware_concurrency();
+  // set nThreads to the number of available Threads if it was not set
+  if (nThreads == 0) nThreads =  std::thread::hardware_concurrency();;
 
   // Initialize the Combination Object (ncols - 1 because of the Intercept col)
   Combination Comb(XInput.n_cols - 1, combsUpTo, nThreads);
@@ -53,7 +53,7 @@ Rcpp::List ExhaustiveSearchCpp(
   std::vector<std::future<ranking>> futures;
   // std::vector<RcppThread::Thread> threads;
   std::vector<std::thread> threads;
-  for (size_t i = 0; i < nThreads; i++) {
+  for (size_t i = 0; i <  Comb.getNBatches(); i++) {
     Comb.setCurrentComb(Comb.getBatchLimits()[i]);
     Comb.setStopComb(Comb.getBatchLimits()[i + 1]);
     std::promise<ranking> p;
@@ -64,7 +64,7 @@ Rcpp::List ExhaustiveSearchCpp(
 
   // Join threads and collect all std::future objects
   std::vector<ranking> allres;
-  for (size_t i = 0; i < nThreads; i++) {
+  for (size_t i = 0; i <  Comb.getNBatches(); i++) {
     threads[i].join();
     allres.push_back(futures[i].get());
   }
@@ -81,13 +81,13 @@ Rcpp::List ExhaustiveSearchCpp(
   // the best of these worst values in all threads, which did not store every
   // single model and remove all results worse than it from all threads.
   float topworst = std::numeric_limits<float>::infinity();
-  for (size_t i = 0; i < nThreads; i++)
+  for (size_t i = 0; i <  Comb.getNBatches(); i++)
     if (allres[i].top().first < topworst && Comb.getBatchSizes()[i] > nResults)
       topworst = allres[i].top().first;
 
   // Combine the elements of all rankings, which are better than topworst
   ranking finaltop;
-  for (size_t i = 0; i < nThreads; i++) while (!allres[i].empty()) {
+  for (size_t i = 0; i <  Comb.getNBatches(); i++) while (!allres[i].empty()) {
     if (allres[i].top().first <= topworst) finaltop.push(allres[i].top());
     allres[i].pop();
     if (finaltop.size() > nResults) finaltop.pop();
@@ -102,13 +102,14 @@ Rcpp::List ExhaustiveSearchCpp(
     finaltop.pop();
   }
 
-
   // Filling up the result object
   Rcpp::List result;
   result.push_back((*SL).getTotalTimeSecs());
   result.push_back(AicList);
   result.push_back(CombList);
   result.push_back(evaluatedModels);
+  result.push_back(nThreads);
+  result.push_back(Comb.getNBatches());
 
   return result;
 }

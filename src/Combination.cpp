@@ -38,7 +38,7 @@ Combination::Combination(uint N, uint k, size_t nBatches) :
 
     // The following computes a set of starting combinations that split all
     // combinations into m_nBatches approx equal parts (a vector of vectors)
-    float targetSize = m_nCombinations / m_nBatches;
+    size_t targetSize = ceil(((float)m_nCombinations) / m_nBatches);
 
     // Initial limit needs to be "(0)" as the evaluation calls nextCombination()
     // as a first step, which thus results in the true first element "(1)"
@@ -47,6 +47,8 @@ Combination::Combination(uint N, uint k, size_t nBatches) :
 
     // The current idea is to iteratively add all combs of k elements with a
     // fixed first digit until the batch is approx of the intended size.
+    // This is not optimal and sometimes results in a smaller number of batches
+    // than intended, but is good enough for most practical purposes.
     uint firstDigit = 0;
     uint curK = 1;
     for (size_t j = 0; j < m_nBatches; j++) {
@@ -70,6 +72,12 @@ Combination::Combination(uint N, uint k, size_t nBatches) :
 
         // Also add the batch size to m_batchSizes
         m_batchSizes.emplace_back(curBatchSize);
+
+        // If all combs are partitioned, stop and return with fewer batches
+        if (curK == m_k) {
+            m_nBatches = m_batchSizes.size();
+            break;
+        }
     }
 }
 

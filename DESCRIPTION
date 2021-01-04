@@ -1,15 +1,18 @@
 Package: ExhaustiveSearch
 Type: Package
-Title: What the Package Does (Title Case)
+Title: A fast and scalable exhaustive feature selection framework
 Version: 0.1.0
-Author: Dr. Rudolf Jagdhuber
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Rudolf Jagdhuber
+Maintainer: Rudolf Jagdhuber <r.jagdhuber@gmx.de>
+Description: A fast and scalable exhaustive feature selection framework, which 
+    is particularly suited for huge tasks, that would typically not be possible 
+    due to memory limitations.  The current version allows to compute
+    linear and logistic regression models and compare them with respect to AIC
+    and MSE.
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-Imports: Rcpp, RcppArmadillo
+Imports: Rcpp
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.1
 URL: https://github.com/RudolfJagdhuber/ExhaustiveSearch

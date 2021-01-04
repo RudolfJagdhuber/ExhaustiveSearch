@@ -70,9 +70,8 @@ Object of class `ExhaustiveSearch` with elements
 Performs an exhaustive feature selection. `ExhaustiveSearch()` is a fast and
 scalable implementation of an exhaustive feature selection framework. It is
 particularly suited for huge tasks, which would typically not be possible due
-to memory limitations.  of candidate The current version allows to compute
-linear and logistic regression models and compare them with respect to AIC
-or MSE.
+to memory limitations. The current version allows to compute linear and
+logistic regression models and compare them with respect to AIC or MSE.
 }
 \details{
 TODO

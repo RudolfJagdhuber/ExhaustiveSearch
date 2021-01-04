@@ -5,26 +5,26 @@
 #' Performs an exhaustive feature selection. `ExhaustiveSearch()` is a fast and
 #' scalable implementation of an exhaustive feature selection framework. It is
 #' particularly suited for huge tasks, which would typically not be possible due
-#' to memory limitations.  of candidate The current version allows to compute
-#' linear and logistic regression models and compare them with respect to AIC
-#' or MSE.
+#' to memory limitations. The current version allows to compute linear and
+#' logistic regression models and compare them with respect to AIC or MSE.
 #'
 #' @details
 #' TODO
 #'
-#' @param formula An object of class '[formula]' (or one that can be coerced to
+#' @param formula An object of class `formula` (or one that can be coerced to
 #'   that class): a symbolic description of the model to be fitted.
 #' @param data A data frame (or object coercible by `as.data.frame` to a data
 #'   frame) containing the variables in the model.
 #' @param family A character string naming the family function similar to the
-#'   parameter in [glm()]. Currently options are 'gaussian' or 'binomial'.
+#'   parameter in `glm()`. Currently options are 'gaussian' or 'binomial'. If
+#'   not specified, the function tries to guess it from the response variable.
 #' @param performanceMeasure A character string naming the performance measure
 #'   to compare models by. Current options are 'AIC' or 'MSE'.
 #' @param combsUpTo An integer of length 1 to set an upper limit to the number
 #'   of features in a combination. This can be useful to drastically reduce the
 #'   total number of combinations to a feasible size.
 #' @param nResults An integer of length 1 to define the size of the final
-#'   ranking list. The default (1000) provides a good trade-off of memory usage
+#'   ranking list. The default (5000) provides a good trade-off of memory usage
 #'   and result size. Set this value to `Inf` to store all models.
 #' @param nThreads Number of threads to use. The default is number of CPUs
 #'   available.
@@ -37,6 +37,8 @@
 #'   appear at the top of the result ranking.
 #' @param quietly logical. If set to TRUE (default), status and runtime updates
 #'   are printed to the console.
+#' @param checkLarge logical. Insanely large calls get stopped by a safety net.
+#'   This parameter can be used to disable it and execute these calls anyway.
 #'
 #' @return Object of class `ExhaustiveSearch` with elements
 #'   \item{nModels}{The total number of evaluated models.}
@@ -53,14 +55,15 @@
 #'
 #' @export
 ExhaustiveSearch = function(formula, data, family = NULL,
-  performanceMeasure = NULL, combsUpTo = NULL, nResults = 1000, nThreads = NULL,
-  testSetIDs = NULL, errorVal = -1, allowHugeStorage = FALSE, quietly = FALSE) {
+  performanceMeasure = NULL, combsUpTo = NULL, nResults = 5000, nThreads = NULL,
+  testSetIDs = NULL, errorVal = -1, allowHugeStorage = FALSE, quietly = FALSE,
+  checkLarge = TRUE) {
 
   formula = formula(formula)
-  if (!inherits(formula, "formula")) stop("\n\nInvalid formula.")
+  if (!inherits(formula, "formula")) stop("\nInvalid formula.")
 
   data = as.data.frame(data)
-  if (!inherits(data, "data.frame")) stop("\n\nInvalid data object.")
+  if (!inherits(data, "data.frame")) stop("\nInvalid data object.")
 
   ## Extract the design matrix with dims, response vector and feature names
   X = stats::model.matrix(formula, data)
@@ -105,7 +108,7 @@ ExhaustiveSearch = function(formula, data, family = NULL,
       "'family' was set to 'gaussian', but the response appears to be\n",
       "binary, are you sure this is intended?\n\n"))
   } else if (family == "gaussian") {
-    if (length(unique(y)) != 2) stop(paste0("\n\n",
+    if (length(unique(y)) != 2) stop(paste0("\n",
       "'family' was set to 'binomial', but the response is not binary.\n\n"))
   }
 
@@ -114,7 +117,7 @@ ExhaustiveSearch = function(formula, data, family = NULL,
     if (nrow(XTest) == 0) performanceMeasure = "AIC"
     else performanceMeasure = "MSE"
   } else if (performanceMeasure == "AIC") {
-    if (nrow(XTest) != 0) stop(paste0("\n\n",
+    if (nrow(XTest) != 0) stop(paste0("\n",
       "A TestSet was defined, but 'performanceMeasure' is set to 'AIC'.\n\n"))
   } else if (performanceMeasure == "MSE") {
     if (nrow(XTest) == 0) warning(paste0("\n\n",
@@ -122,19 +125,26 @@ ExhaustiveSearch = function(formula, data, family = NULL,
       "Comparing MSE values on training data will always prefer the higher\n",
       "dimensional model in nested setups and is thus not recommended for\n",
       "feature selection tasks.\n\n"))
-  } else stop(paste0("\n\n",
+  } else stop(paste0("\n",
     "Unsupported performanceMeasure! Please check the help file for a list\n",
     "of all available options.\n\n"))
 
   ## Check combUpTo parameter
   if (is.null(combsUpTo)) combsUpTo = length(feats)
   if (!is.numeric(combsUpTo) | length(combsUpTo) != 1 | any(combsUpTo <= 0))
-    stop("\n\ncombsUpTo needs to be a single numeric value > 0\n\n")
+    stop("\ncombsUpTo needs to be a single numeric value > 0\n\n")
   if (combsUpTo == Inf) combsUpTo = length(feats)
 
 
-  ## Check nResults parameter and safety-check if the user requests huge memory
+  ## Safety-check if the user requests a huge task
   nCombs = sum(choose(length(feats), seq(combsUpTo)))
+  if (nCombs > 1e8 & checkLarge) stop(paste0(
+    "\nThe requested task needs to evaluate a huge number of combinations:\n\n",
+    "  -> ", format(nCombs, big.mark = ",", scientific = FALSE)," models.\n\n",
+    "Consider reducing the total number of combinations with 'combsUpTo'.\n\n",
+    "To continue with this setup, set the parameter 'checkLarge = FALSE'.\n\n"))
+
+  ## Check nResults parameter
   if (is.null(nResults)) nResults = nCombs
   if (!is.numeric(nResults) | length(nResults) != 1 | any(nResults <= 0))
     stop("\nnResults needs to be a single numeric value > 0")
@@ -143,12 +153,12 @@ ExhaustiveSearch = function(formula, data, family = NULL,
   # Check nThreads parameter, if not set detect later in C++
   if (is.null(nThreads)) nThreads = 0
   else if (!is.numeric(nThreads) | length(nThreads) != 1 | nThreads %% 1 != 0)
-    stop("\n\nnThreads needs to be a single integer value\n\n")
+    stop("\nnThreads needs to be a single integer value\n\n")
 
   ## Check errorVal parameter
   if (is.null(errorVal)) stop("\nerrorVal parameter cannot be NULL\n\n")
   if (!is.numeric(errorVal) | length(errorVal) != 1)
-    stop("\n\nerrorVal needs to be a single numeric value\n\n")
+    stop("\nerrorVal needs to be a single numeric value\n\n")
 
   if (!quietly) cat("\nStarting the exhaustive evaluation.\n\n")
 
@@ -181,12 +191,13 @@ ExhaustiveSearch = function(formula, data, family = NULL,
   result$featureNames = feats
   result$setup = list(call = match.call(), family = family,
     performanceMeasure = performanceMeasure, intercept = intercept,
-    combsUpTo = combsUpTo, nResults = nResults, nThreads = nThreads,
-    testSetIDs = testSetIDs, nTrain = nrow(X), nTest = nrow(XTest))
+    combsUpTo = combsUpTo, nResults = nResults, nThreads = cppOutput[[5]],
+    nBatches = cppOutput[[6]], testSetIDs = testSetIDs, nTrain = nrow(X),
+    nTest = nrow(XTest))
 
   if (!quietly) {
     if (cppOutput[[4]] == nCombs) cat("\nEvaluation finished successfully.\n\n")
-    else warning("\nEvaluation Incomplete! Not all models were evaluated!\n\n")
+    else warning("\n\nEvaluation Incomplete! Not all models were evaluated!\n")
   }
 
   return(result)
