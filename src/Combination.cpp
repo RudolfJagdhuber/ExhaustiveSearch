@@ -60,7 +60,7 @@ Combination::Combination(uint N, uint k, size_t nBatches) :
             else if (curK < m_k) {// Start with next larger set of combinations
                 curK++;
                 firstDigit = 1;
-            } else break; // Last combination reached, nothing more to add
+            } else break; // Last combination reached
 
             curBatchSize += NoverK(m_N - firstDigit, curK - 1);
         }
@@ -74,7 +74,7 @@ Combination::Combination(uint N, uint k, size_t nBatches) :
         m_batchSizes.emplace_back(curBatchSize);
 
         // If all combs are partitioned, stop and return with fewer batches
-        if (curK == m_k) {
+        if (curK == m_k && firstDigit == m_N - curK + 1) {
             m_nBatches = m_batchSizes.size();
             break;
         }

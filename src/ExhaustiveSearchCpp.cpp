@@ -69,9 +69,8 @@ Rcpp::List ExhaustiveSearchCpp(
     allres.push_back(futures[i].get());
   }
 
-  size_t evaluatedModels = (*SL).getCurIters();
-
   // Finalize the StatusLog object and print the footer of the table
+  size_t evaluatedModels = (*SL).getCurIters();
   (*SL).finalize();
   if (!quietly) Rcpp::Rcout << (*SL).footer() << std::endl;;
 

@@ -30,7 +30,7 @@ print.ExhaustiveSearch = function(x) {
     ifelse(x$evaluatedModels != x$nModels, " (Incomplete!)", ""), "\n")
   cat("Models saved:         ", format(x$setup$nResults, big.mark = ","), "\n")
   cat("Total runtime:        ", formatSecTime(x$runtimeSec), "\n")
-  cat("Number of threads:    ", x$setup$nBatches, "\n")
+  cat("Threads used:         ", x$setup$nBatches, "of", x$setup$nThreads, "\n")
   cat("\n+-------------------------------------------------+")
   cat("\n|                Top Feature Sets                 |")
   cat("\n+-------------------------------------------------+\n")
