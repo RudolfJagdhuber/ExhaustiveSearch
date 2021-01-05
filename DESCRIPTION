@@ -11,9 +11,9 @@ Description: A fast and scalable exhaustive feature selection framework, which
     and MSE.
 License: GPL (>= 3)
 Encoding: UTF-8
-LazyData: true
 Imports: Rcpp
 LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.1.1
+Roxygen: list(markdown = TRUE)
 URL: https://github.com/RudolfJagdhuber/ExhaustiveSearch
 BugReports: https://github.com/RudolfJagdhuber/ExhaustiveSearch/issues

@@ -13,8 +13,8 @@ void ExhaustiveThread(size_t threadID, GLM Model, Combination Comb,
   ranking result;
 
   size_t iteration = 0;
-  size_t printAfter  = (Model.getFamily() == "gaussian") ? 500000 : 10000;
-  size_t updateAfter = (Model.getFamily() == "gaussian") ? 50000  : 1000;
+  size_t printAfter  = (Model.getFamily() == "gaussian") ? 500000 : 2000;
+  size_t updateAfter = (Model.getFamily() == "gaussian") ? 50000  : 500;
 
   // Step to the next combination and evaluate it, as long as there is one
   while (Comb.nextCombination()) {

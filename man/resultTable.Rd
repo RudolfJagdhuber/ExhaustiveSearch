@@ -9,28 +9,47 @@ resultTable(ESResult, n = Inf, insertStart = "")
 \arguments{
 \item{ESResult}{a result object from an exhaustive search.}
 
-\item{n}{number of results to be returned. The default (`Inf`) returns every
-result available in `ESResult`.}
+\item{n}{number of results to be returned. The default (\code{Inf}) returns every
+result available in \code{ESResult}.}
 
 \item{insertStart}{used for additional spacing when printing. The value of
-`insertStart` gets printed in front of every feature combination to
+\code{insertStart} gets printed in front of every feature combination to
 increase the space to the printed performance measure.}
 }
 \value{
-A `data.frame` with two columns. The first one shows the performance
-  values and the second shows the decoded feature set collapsed with plus
-  signs.
+A \code{data.frame} with two columns. The first one shows the performance
+values and the second shows the decoded feature set collapsed with plus
+signs.
 }
 \description{
-Extract the top `n` results of an exhaustive search and present them as a
-`data.frame` object.
+Extract the top \code{n} results of an exhaustive search and present them as a
+\code{data.frame} object.
 }
 \details{
 The result of an exhaustive search is given by an object of class
 ExhaustiveSearch, which is a list of encoded feature combinations and
 performance values. This function decodes the feature combinations and
-presents them in a `data.frame` together with the respective performance
+presents them in a \code{data.frame} together with the respective performance
 values
+}
+\examples{
+## Exhaustive search on the mtcars data
+data(mtcars)
+ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian")
+
+## Summary data.frame of the top 5 models
+resultTable(ES, 5)
+
+## Return a data.frame of all stored models
+res <- resultTable(ES)
+str(res)
+
+## Add custom characters for printing
+resultTable(ES, 1, "  <->  ")
+
+}
+\seealso{
+\code{\link[=ExhaustiveSearch]{ExhaustiveSearch()}}
 }
 \author{
 Rudolf Jagdhuber

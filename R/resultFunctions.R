@@ -22,7 +22,24 @@
 #'   values and the second shows the decoded feature set collapsed with plus
 #'   signs.
 #'
+#' @examples
+#' ## Exhaustive search on the mtcars data
+#' data(mtcars)
+#' ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian")
+#'
+#' ## Summary data.frame of the top 5 models
+#' resultTable(ES, 5)
+#'
+#' ## Return a data.frame of all stored models
+#' res <- resultTable(ES)
+#' str(res)
+#'
+#' ## Add custom characters for printing
+#' resultTable(ES, 1, "  <->  ")
+#'
 #' @author Rudolf Jagdhuber
+#'
+#' @seealso [ExhaustiveSearch()]
 #'
 #' @export
 resultTable = function(ESResult, n = Inf, insertStart = "") {
@@ -49,7 +66,20 @@ resultTable = function(ESResult, n = Inf, insertStart = "") {
 #'   If an intercept is included, the first element of this vector is "1". If
 #'   `ranks` includes multiple values, a list of such vectors is returned.
 #'
+#' @examples
+#' ## Exhaustive search on the mtcars data
+#' data(mtcars)
+#' ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian")
+#'
+#' ## Get the feature combinations of the top 3 models
+#' getFeatures(ES, 1:3)
+#'
+#' ## Get the feature combination of the 531th best model
+#' getFeatures(ES, 531)
+#'
 #' @author Rudolf Jagdhuber
+#'
+#' @seealso [ExhaustiveSearch()]
 #'
 #' @export
 getFeatures = function(ESResult, ranks) {

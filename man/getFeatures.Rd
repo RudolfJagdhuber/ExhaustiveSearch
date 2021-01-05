@@ -13,13 +13,28 @@ getFeatures(ESResult, ranks)
 returned.}
 }
 \value{
-If `ranks` is a single value, a vector of feature names is returned.
-  If an intercept is included, the first element of this vector is "1". If
-  `ranks` includes multiple values, a list of such vectors is returned.
+If \code{ranks} is a single value, a vector of feature names is returned.
+If an intercept is included, the first element of this vector is "1". If
+\code{ranks} includes multiple values, a list of such vectors is returned.
 }
 \description{
 A simple function to get a vector of feature names for one or more elements
 of an ExhaustiveSearch object.
+}
+\examples{
+## Exhaustive search on the mtcars data
+data(mtcars)
+ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian")
+
+## Get the feature combinations of the top 3 models
+getFeatures(ES, 1:3)
+
+## Get the feature combination of the 531th best model
+getFeatures(ES, 531)
+
+}
+\seealso{
+\code{\link[=ExhaustiveSearch]{ExhaustiveSearch()}}
 }
 \author{
 Rudolf Jagdhuber

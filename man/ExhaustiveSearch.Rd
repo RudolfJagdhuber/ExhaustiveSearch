@@ -2,7 +2,7 @@
 % Please edit documentation in R/ExhaustiveSearch.R
 \name{ExhaustiveSearch}
 \alias{ExhaustiveSearch}
-\title{Exhaustive feature selection function}
+\title{Exhaustive feature selection}
 \usage{
 ExhaustiveSearch(
   formula,
@@ -10,71 +10,163 @@ ExhaustiveSearch(
   family = NULL,
   performanceMeasure = NULL,
   combsUpTo = NULL,
-  nResults = 1000,
+  nResults = 5000,
   nThreads = NULL,
   testSetIDs = NULL,
   errorVal = -1,
   allowHugeStorage = FALSE,
-  quietly = FALSE
+  quietly = FALSE,
+  checkLarge = TRUE
 )
 }
 \arguments{
-\item{formula}{An object of class '[formula]' (or one that can be coerced to
+\item{formula}{An object of class \link{formula} (or one that can be coerced to
 that class): a symbolic description of the model to be fitted.}
 
-\item{data}{A data frame (or object coercible by `as.data.frame` to a data
-frame) containing the variables in the model.}
+\item{data}{A \link{data.frame} (or object coercible by \code{\link[=as.data.frame]{as.data.frame()}} to a
+\link{data.frame}) containing the variables in the model.}
 
-\item{family}{A character string naming the family function similar to the
-parameter in [glm()]. Currently options are 'gaussian' or 'binomial'.}
+\item{family}{A \link{character} string naming the family function similar to the
+parameter in \code{\link[=glm]{glm()}}. Currently options are 'gaussian' or 'binomial'. If
+not specified, the function tries to guess it from the response variable.}
 
-\item{performanceMeasure}{A character string naming the performance measure
-to compare models by. Current options are 'AIC' or 'MSE'.}
+\item{performanceMeasure}{A \link{character} string naming the performance measure
+to compare models by. Currently available options are 'AIC' (Akaike's An
+Information Criterion) or 'MSE' (Mean Squared Error).}
 
 \item{combsUpTo}{An integer of length 1 to set an upper limit to the number
 of features in a combination. This can be useful to drastically reduce the
 total number of combinations to a feasible size.}
 
 \item{nResults}{An integer of length 1 to define the size of the final
-ranking list. The default (1000) provides a good trade-off of memory usage
-and result size. Set this value to `Inf` to store all models.}
+ranking list. The default (5000) provides a good trade-off of memory usage
+and result size. Set this value to \code{Inf} to store all models.}
 
-\item{nThreads}{Number of threads to use. The default is number of CPUs
-available.}
+\item{nThreads}{Number of threads to use. The default is to detect the
+available number of threads automatically.}
 
 \item{testSetIDs}{A vector of row indices of data, which define the test set
-partition. If this parameter is `NULL` (default), models are trained and
+partition. If this parameter is \code{NULL} (default), models are trained and
 evaluated on the full data set. If it is set, models are trained on
-`data[-testSetIDs,]` and tested on `data[testSetIDs,]`.}
+\code{data[-testSetIDs,]} and tested on \code{data[testSetIDs,]}.}
 
 \item{errorVal}{A numeric value defining what performance result is returned
 if the model could not be fitted. The default (-1) makes those models
 appear at the top of the result ranking.}
 
-\item{quietly}{logical. If set to TRUE (default), status and runtime updates
-are printed to the console.}
+\item{quietly}{\link{logical}. If set to \code{TRUE} (default), status and runtime
+updates are printed to the console.}
+
+\item{checkLarge}{\link{logical}. Very large calls get stopped by a safety net.
+This parameter can be used to execute these calls anyway.}
 }
 \value{
-Object of class `ExhaustiveSearch` with elements
-  \item{nModels}{The total number of evaluated models.}
-  \item{runtimeSec}{The total runtime of the exhaustive search in seconds.}
-  \item{ranking}{A list of the performance values and the featureIDs. The
-  i-th element of both correspond. The featureIDs refer to the elements of
-  `featureNames`. Formatted results of these rankings can e.g. be obtained
-  with [getFeatures()].}
-  \item{featureNames}{The feature names in the given data. `featureIDs` in
-  the ranking element refer to this vector.}
-  \item{setup}{A list of imput parameters from the function call.}
+Object of class \code{ExhaustiveSearch} with elements
+\item{nModels}{The total number of evaluated models.}
+\item{runtimeSec}{The total runtime of the exhaustive search in seconds.}
+\item{ranking}{A list of the performance values and the featureIDs. The
+i-th element of both correspond. The featureIDs refer to the elements of
+\code{featureNames}. Formatted results of these rankings can e.g. be obtained
+with \code{\link[=getFeatures]{getFeatures()}}, or \code{\link[=resultTable]{resultTable()}}.}
+\item{featureNames  }{The feature names in the given data.
+\code{featureIDs} in the ranking element refer to this vector.}
+\item{setup}{A list of imput parameters from the function call.}
 }
 \description{
-Performs an exhaustive feature selection. `ExhaustiveSearch()` is a fast and
+Performs an exhaustive feature selection. \code{ExhaustiveSearch()} is a fast and
 scalable implementation of an exhaustive feature selection framework. It is
 particularly suited for huge tasks, which would typically not be possible due
 to memory limitations. The current version allows to compute linear and
 logistic regression models and compare them with respect to AIC or MSE.
 }
 \details{
-TODO
+An exhaustive search evaluates all setups of a combinatorial task. In feature
+and model selection application, exhaustive searches are often referred to as
+\emph{optimal} search strategies, as they test each setup and therefore ensure to
+find the best solution. The main downside of this approach is the possibly
+enormous computational complexity of the task. \code{ExhaustiveSearch()} provides
+an easy to use and efficient framework for these tasks.
+
+Its main characteristics are:
+\itemize{
+\item Combinations are iteratively generated on the fly,
+\item Model fitting and evalution is performed multi-threaded in C++,
+\item Only a fixed amount of models are stored to keep memory usage small.
+}
+
+Therefore, the framework of this package is able to evaluate huge tasks of
+billions of models, while only being limited by run-time.
+
+Currently, ordinary linear regression models similar to \code{\link[=lm]{lm()}} and logistic
+regression models similar to \code{\link[=glm]{glm()}} (with parameter \code{family = "binomial"})
+can be fitted. The model type is specified via the \code{family} parameter. All
+model results of the C++ backend are identical to what would be obtained by
+\code{\link[=glm]{glm()}} or \code{\link[=lm]{lm()}}. For that, the logistic regression also uses the same
+\href{https://en.wikipedia.org/wiki/Limited-memory_BFGS}{L-BFGS} optimizer
+as \code{\link[=glm]{glm()}}.
+
+To assess the quality of a model, the \code{performanceMeasure} options 'AIC'
+(Akaike's An Information Criterion) and 'MSE' (Mean Squared Error) are
+implemented. Note that the AIC can only be computed on the training data,
+while it is recommended for the MSE to be computed on independent test data.
+If \code{performanceMeasure} is not set, it will be decided according to the
+definition of a test data set.
+
+While this framework is able to handle very large amounts of combinations, an
+exhaustive search of every theoretical combination can still be unfeasible.
+However, a possible way to drastically limit the total number of combinations
+is to define an upper bound for the size of a combination. For example,
+evaluating all combinations of 500 features ($3.3\cdot 10^150$) is obviously
+impossible. But if we only consider combinations of up to 3 features, this
+number reduces to around 21 million, which could easily be evaluated by this
+framework in less than a minute (16 threads). The upper limit can be set by
+the parameter \code{combsUpTo}.
+
+A core element of why this framework does not require more memory if tasks
+get larger is that at any point the best models are stored in a list of
+fixed size. Therefore, sub-optimal models are not saved and do not take space
+and time to be handled. The parameter defining the size of the models, which
+are actively stored is \code{nResults}. Large values here can impair performance
+or even cause errors, if the system memory runs out and should always be set
+with care. The function will however warn you beforehand if you set a very
+large value here.
+
+The parameter \code{testSetIDs} can be used to split the data into a training and
+testing partition. If it is not set, all models will be trained and tested on
+the full data set. If it is set, the data will be split beforehand into
+\code{data[testSetIDs,]} and \code{data[-testSetIDs,]}.
+
+The development version of this package can be found at
+\url{https://github.com/RudolfJagdhuber/ExhaustiveSearch}. Issues or requests
+are handled on this page.
+}
+\examples{
+## Linear Regression on mtcars data
+data(mtcars)
+
+##  Exhaustive search of 1023 models compared by AIC
+ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian",
+  performanceMeasure = "AIC")
+print(ES)
+
+## Same setup, but compared by MSE on a test set partition
+testIDs <- sample(nrow(mtcars), round(1/3 * nrow(mtcars)))
+ES2 <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian",
+  performanceMeasure = "MSE", testSetIDs = testIDs)
+print(ES2)
+
+
+## Logistic Regression on Ionosphere Data
+data("Ionosphere", package = "mlbench")
+
+## Only combinations of up to 3 features! -> 5488 models instead of 4 billion
+ES3 <- ExhaustiveSearch((Class == "good") ~ ., data = Ionosphere[,-c(1,2)],
+  family = "binomial", combsUpTo = 3)
+print(ES3)
+
+}
+\seealso{
+\code{\link[=resultTable]{resultTable()}}, \code{\link[=getFeatures]{getFeatures()}}
 }
 \author{
 Rudolf Jagdhuber
