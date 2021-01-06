@@ -71,7 +71,9 @@
 #' are handled on this page.
 #'
 #' @param formula An object of class [formula] (or one that can be coerced to
-#'   that class): a symbolic description of the model to be fitted.
+#'   that class): a symbolic description of the feature and response structure.
+#'   All combinations of features on the right hand side of the formula are
+#'   evaluated.
 #' @param data A [data.frame] (or object coercible by [as.data.frame()] to a
 #'   [data.frame]) containing the variables in the model.
 #' @param family A [character] string naming the family function similar to the
