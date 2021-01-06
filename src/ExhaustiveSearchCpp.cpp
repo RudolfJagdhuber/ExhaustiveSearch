@@ -109,6 +109,8 @@ Rcpp::List ExhaustiveSearchCpp(
   result.push_back(evaluatedModels);
   result.push_back(nThreads);
   result.push_back(Comb.getNBatches());
+  result.push_back(Comb.getBatchSizes());
+  result.push_back(Comb.getBatchLimits());
 
   return result;
 }

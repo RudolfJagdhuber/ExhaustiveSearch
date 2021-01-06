@@ -36,45 +36,106 @@ Combination::Combination(uint N, uint k, size_t nBatches) :
     // Compute the total number of existing combinations with this setup.
     m_nCombinations = computeCombinations(m_N, m_k);
 
-    // The following computes a set of starting combinations that split all
-    // combinations into m_nBatches approx equal parts (a vector of vectors)
+    // The following algorithm computes a set of starting combinations that
+    // split all combinations into almost equal sized parts and returns
+    // a vector of the combinations that divide the batches
+
+    // The intended minimal size of each batch. Use ceil(), if it would create
+    // enough batches, if not, use floor() (= ceil() - 1).
     size_t targetSize = ceil(((float)m_nCombinations) / m_nBatches);
+    if (targetSize * (m_nBatches - 1) >= m_nCombinations) targetSize--;
 
     // Initial limit needs to be "(0)" as the evaluation calls nextCombination()
     // as a first step, which thus results in the true first element "(1)"
     std::vector<uint> element{0};
     m_batchLimits.emplace_back(element);
 
-    // The current idea is to iteratively add all combs of k elements with a
-    // fixed first digit until the batch is approx of the intended size.
-    // This is not optimal and sometimes results in a smaller number of batches
-    // than intended, but is good enough for most practical purposes.
-    uint firstDigit = 0;
-    uint curK = 1;
+    // The current position within 'element' under evaluation
+    int indent = 0;
+    // The current length 'element', basically just: element.size();
+    size_t curLength = element.size();
+    // The current value under inspection, basically just: element[indent];
+    uint digit = 0;
+    // Both values are necessary copies, as element gets changed repeatedly
+
+    // One iteration per batch limit to be identified
     for (size_t j = 0; j < m_nBatches; j++) {
 
-        // Continue to add combs until the batch size is large enough
-        size_t curBatchSize = 0;
-        while (curBatchSize < targetSize) {
-            if (firstDigit < m_N - curK + 1) firstDigit++;
-            else if (curK < m_k) {// Start with next larger set of combinations
-                curK++;
-                firstDigit = 1;
-            } else break; // Last combination reached
+        // The final iteration is trivial so avoid unnecessary computations here
+        if (j == m_nBatches - 1) {
+            // Insert the last combination
+            element.clear();
+            for (uint i = m_N - m_k + 1; i <= m_N ; i++)
+                element.emplace_back(i);
+            m_batchLimits.push_back(element);
 
-            curBatchSize += NoverK(m_N - firstDigit, curK - 1);
+            // Insert the size of the remaining combinations
+            size_t combsNow = 0;
+            for (size_t& n : m_batchSizes) combsNow += n;
+            m_batchSizes.push_back(m_nCombinations - combsNow);
+
+            break;
         }
 
-        // Found starting number firstDigit of a combination of curK. -> Add it
-        element.clear();
-        for (uint i = 0; i < curK; i++) element.emplace_back(firstDigit + i);
+        // Continue to add combs until the batch size is reached
+        size_t curBatchSize = 0;
+        size_t projectedSize = 0;
+        while (curBatchSize < targetSize) {
+
+            // Identify at which position (indent) I can increase without
+            // overshooting the targetSize. There is always the option to just
+            // add 1 combination, so this loop will terminate eventually.
+            do {
+                // What would an increase add to curBatchSize?
+                projectedSize = curBatchSize +
+                    NoverK(m_N - element[indent], curLength - indent - 1);
+
+                // If it would overshoot, I will retry with a higher indent
+                if (projectedSize > targetSize) indent++;
+            } while (projectedSize > targetSize);
+
+            // I have now decided which step to make, so lets make it
+
+            // First find the indent at which it is possible to increase
+            while (element[indent] >= m_N - curLength + indent + 1) {
+                indent--;
+                if (indent == -1) break;
+            }
+
+            // Is there still a way to increase the current combination?
+            if (indent != -1) {
+                // Increase at indent position and set all following accordingly
+                digit = element[indent];
+                for (size_t i = 0; i < (curLength - indent); i++)
+                    element[indent + i] =  digit + i + 1;
+
+            // indent == -1 means no increase possible at current length
+            // Try to start with the next larger length if possible.
+            } else if (curLength < m_k) {
+                curLength++;
+                indent = 0;
+                element.clear();
+                for (uint i = 1; i <= curLength ; i++) element.emplace_back(i);
+
+            // If not possible, the last combination was reached and its done.
+            // Note: this should never be reached, due to the shortcut taken in
+            // the final iteration
+            } else break;
+
+            // The step was made and the projected size is now reality.
+            curBatchSize = projectedSize;
+        }
+
+        // A combination was found -> Add it.
         m_batchLimits.emplace_back(element);
 
-        // Also add the batch size to m_batchSizes
+        // Also add the resulting batch size to m_batchSizes
         m_batchSizes.emplace_back(curBatchSize);
 
-        // If all combs are partitioned, stop and return with fewer batches
-        if (curK == m_k && firstDigit == m_N - curK + 1) {
+        // This line just ensures that the algorithm finishes after the last
+        // combination, even if for some reason the combinations were split into
+        // less than m_nBatches.
+        if (curLength == m_k && element[0] == m_N - m_k + 1) {
             m_nBatches = m_batchSizes.size();
             break;
         }

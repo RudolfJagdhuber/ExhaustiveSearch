@@ -9,9 +9,20 @@ formatSecTime = function(sec) {
                c("d ", "h ", "m ", "s")), collapse = "")
 }
 
-
+#' Print ExhaustiveSearch
+#'
+#' Prints a compact summary of the results of an ExhaustiveSearch object.
+#'
+#' @param x Object of class 'ExhaustiveSearch'.
+#' @param ... Further arguments passed to or from other methods.
+#'
+#' @author Rudolf Jagdhuber
+#'
+#' @seealso [ExhaustiveSearch()]
+#'
+#' @importFrom utils capture.output
 #' @export
-print.ExhaustiveSearch = function(x) {
+print.ExhaustiveSearch = function(x, ...) {
 
   evalOn = ifelse(x$setup$nTest == 0,
     paste0("training set (n = ", format(x$setup$nTrain, big.mark = ","), ")\n"),
@@ -30,7 +41,7 @@ print.ExhaustiveSearch = function(x) {
     ifelse(x$evaluatedModels != x$nModels, " (Incomplete!)", ""), "\n")
   cat("Models saved:         ", format(x$setup$nResults, big.mark = ","), "\n")
   cat("Total runtime:        ", formatSecTime(x$runtimeSec), "\n")
-  cat("Threads used:         ", x$setup$nBatches, "of", x$setup$nThreads, "\n")
+  cat("Number of threads:    ", x$batchInfo$nBatches, "\n")
   cat("\n+-------------------------------------------------+")
   cat("\n|                Top Feature Sets                 |")
   cat("\n+-------------------------------------------------+\n")

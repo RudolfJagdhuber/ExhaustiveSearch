@@ -43,11 +43,12 @@
 #' exhaustive search of every theoretical combination can still be unfeasible.
 #' However, a possible way to drastically limit the total number of combinations
 #' is to define an upper bound for the size of a combination. For example,
-#' evaluating all combinations of 500 features ($3.3\cdot 10^150$) is obviously
+#' evaluating all combinations of 500 features (3.3e150) is obviously
 #' impossible. But if we only consider combinations of up to 3 features, this
 #' number reduces to around 21 million, which could easily be evaluated by this
-#' framework in less than a minute (16 threads). The upper limit can be set by
-#' the parameter `combsUpTo`.
+#' framework in less than a minute (16 threads). Setting an upper limit is thus
+#' a very powerful option to enable high dimensional analyses. It is implemented
+#' by the parameter `combsUpTo`.
 #'
 #' A core element of why this framework does not require more memory if tasks
 #' get larger is that at any point the best models are stored in a list of
@@ -108,7 +109,11 @@
 #'     with [getFeatures()], or [resultTable()].}
 #'   \item{featureNames&#160;&#160;}{The feature names in the given data.
 #'     `featureIDs` in the ranking element refer to this vector.}
-#'   \item{setup}{A list of imput parameters from the function call.}
+#'   \item{batchInfo}{A list of information on the batches, into which the
+#'     total task has been partitioned. List elements are the number of batches,
+#'     the number of elements per batch, and the combination boundaries that
+#'     define the batches.}
+#'   \item{setup}{A list of input parameters from the function call.}
 #'
 #' @examples
 #' ## Linear Regression on mtcars data
@@ -143,8 +148,7 @@
 #' @export
 ExhaustiveSearch = function(formula, data, family = NULL,
   performanceMeasure = NULL, combsUpTo = NULL, nResults = 5000, nThreads = NULL,
-  testSetIDs = NULL, errorVal = -1, allowHugeStorage = FALSE, quietly = FALSE,
-  checkLarge = TRUE) {
+  testSetIDs = NULL, errorVal = -1, quietly = FALSE, checkLarge = TRUE) {
 
   formula = formula(formula)
   if (!inherits(formula, "formula")) stop("\nInvalid formula.")
@@ -276,11 +280,12 @@ ExhaustiveSearch = function(formula, data, family = NULL,
     performance = cppOutput[[2]],
     featureIDs = cppOutput[[3]])
   result$featureNames = feats
+  result$batchInfo = list(nBatches = cppOutput[[6]],
+    batchSizes = cppOutput[[7]], batchLimits = cppOutput[[8]])
   result$setup = list(call = match.call(), family = family,
     performanceMeasure = performanceMeasure, intercept = intercept,
     combsUpTo = combsUpTo, nResults = nResults, nThreads = cppOutput[[5]],
-    nBatches = cppOutput[[6]], testSetIDs = testSetIDs, nTrain = nrow(X),
-    nTest = nrow(XTest))
+    testSetIDs = testSetIDs, nTrain = nrow(X), nTest = nrow(XTest))
 
   if (!quietly) {
     if (cppOutput[[4]] == nCombs) cat("\nEvaluation finished successfully.\n\n")

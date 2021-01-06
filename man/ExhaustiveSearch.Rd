@@ -14,7 +14,6 @@ ExhaustiveSearch(
   nThreads = NULL,
   testSetIDs = NULL,
   errorVal = -1,
-  allowHugeStorage = FALSE,
   quietly = FALSE,
   checkLarge = TRUE
 )
@@ -70,7 +69,11 @@ i-th element of both correspond. The featureIDs refer to the elements of
 with \code{\link[=getFeatures]{getFeatures()}}, or \code{\link[=resultTable]{resultTable()}}.}
 \item{featureNames  }{The feature names in the given data.
 \code{featureIDs} in the ranking element refer to this vector.}
-\item{setup}{A list of imput parameters from the function call.}
+\item{batchInfo}{A list of information on the batches, into which the
+total task has been partitioned. List elements are the number of batches,
+the number of elements per batch, and the combination boundaries that
+define the batches.}
+\item{setup}{A list of input parameters from the function call.}
 }
 \description{
 Performs an exhaustive feature selection. \code{ExhaustiveSearch()} is a fast and
@@ -116,11 +119,12 @@ While this framework is able to handle very large amounts of combinations, an
 exhaustive search of every theoretical combination can still be unfeasible.
 However, a possible way to drastically limit the total number of combinations
 is to define an upper bound for the size of a combination. For example,
-evaluating all combinations of 500 features ($3.3\cdot 10^150$) is obviously
+evaluating all combinations of 500 features (3.3e150) is obviously
 impossible. But if we only consider combinations of up to 3 features, this
 number reduces to around 21 million, which could easily be evaluated by this
-framework in less than a minute (16 threads). The upper limit can be set by
-the parameter \code{combsUpTo}.
+framework in less than a minute (16 threads). Setting an upper limit is thus
+a very powerful option to enable high dimensional analyses. It is implemented
+by the parameter \code{combsUpTo}.
 
 A core element of why this framework does not require more memory if tasks
 get larger is that at any point the best models are stored in a list of
