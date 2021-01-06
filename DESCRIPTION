@@ -1,14 +1,26 @@
 Package: ExhaustiveSearch
 Type: Package
-Title: A fast and scalable exhaustive feature selection framework
+Title: A Fast and Scalable Exhaustive Feature Selection Framework
 Version: 0.1.0
-Author: Rudolf Jagdhuber
-Maintainer: Rudolf Jagdhuber <r.jagdhuber@gmx.de>
-Description: A fast and scalable exhaustive feature selection framework, which 
-    is particularly suited for huge tasks, that would typically not be possible 
-    due to memory limitations.  The current version allows to compute
-    linear and logistic regression models and compare them with respect to AIC
-    and MSE.
+Authors@R: 
+    c(person(given = "Rudolf",
+             family = "Jagdhuber",
+             role = c("aut", "cre"),
+             email = "r.jagdhuber@gmail.com"),
+      person(given = "Jorge",
+             family = "Nocedal",
+             role = "cph",
+             comment = "lbfgs c library"),
+      person(given = "Naoaki",
+             family = "Okazaki",
+             role = "cph",
+             comment = "lbfgs c library"))
+Description: The goal of this package is to provide an easy to use, fast and
+    and scalable exhaustive search framework. Exhaustive feature selections 
+    typically require a very large number of models to be fitted and evaluated. 
+    Execution speed and memory management are crucial factors for these tasks. 
+    The package solves both issues with a multi-threaded C++ backend, which 
+    keeps memory usage constant by only storing the best results.
 License: GPL (>= 3)
 Encoding: UTF-8
 Imports: Rcpp
@@ -17,3 +29,5 @@ RoxygenNote: 7.1.1
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/RudolfJagdhuber/ExhaustiveSearch
 BugReports: https://github.com/RudolfJagdhuber/ExhaustiveSearch/issues
+Suggests: 
+    mlbench
