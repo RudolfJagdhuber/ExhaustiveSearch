@@ -1,5 +1,5 @@
 
-# ExhaustiveSearch <img src="man/figures/logo.svg" align="right" height = 65/>
+# ExhaustiveSearch <img src="man/figures/logo.svg" align="right" height = 87/>
 
 <!-- badges: start -->
 [![](https://www.r-pkg.org/badges/version/ExhaustiveSearch?color=blue)](https://cran.r-project.org/package=ExhaustiveSearch)
