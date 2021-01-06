@@ -18,7 +18,7 @@ that would normally be seen as unfeasible in standard setups.
 This package is not yet available on CRAN. However, I intend to publish it as 
 soon as possible.
 
-Until then you can use the development version from Github:
+Until then you can use the current development version from GitHub:
 ``` r
 devtools::install_github("RudolfJagdhuber/ExhaustiveSearch")
 ```
@@ -26,12 +26,11 @@ devtools::install_github("RudolfJagdhuber/ExhaustiveSearch")
 ## Usage
 
 The main function `ExhaustiveSearch()` uses the typical `formula` and `data`
-structure, which you might be familiar with from functions like `lm()` or 
-`glm()`. 
+structure, which might be familiar to you from functions like `lm()` or `glm()`. 
 
-As a first example, let us try to evaluate all feature combinations to predict 
-the miles per gallon (mpg) in the `mtcars` data 
-
+As a simple example, an exhaustive linear regression task of the mtcars data set
+is analyzed. We evaluate all possible feature combinations to predict the 
+response variable 'mpg' (miles per gallon).
 ``` r
 library(ExhaustiveSearch)
 
@@ -48,8 +47,9 @@ Starting the exhaustive evaluation.
 
 Evaluation finished successfully.
 ```
-The evaluation of 1023 models only took a tiny fraction of a second. Printing 
-the result object to the console creates an overview of the evaluation.
+As you can see, the evaluation of 1023 models only took a fraction of a second. 
+Printing the result object to the console creates an overview with further 
+details to the task.
 ``` r
 print(ES)
 ```
@@ -77,26 +77,27 @@ Number of threads:     16
 4 154.9740   disp + hp + wt + qsec + am
 5 155.4766                cyl + hp + wt 
 ```
-There are are lot more options to the exhaustive search, which are documented in
-the help files (see `?ExhaustiveSearch()`). These include:
-- logistic regression models for classification
-- Other performance measures
-- limiting the size of combinations (e.g. only up to 5 features)
-- defining separate training and testing partitions
-- ...
+There are a lot more options to the exhaustive search function, which are 
+documented in the help files (see `?ExhaustiveSearch()`). These include:
+
+* logistic regression models for classification
+* other performance measures
+* limiting the size of combinations (e.g. only up to 5 features)
+* defining separate training and testing partitions
+* ...
 
 
 ## Performance
 The example above is an easy task for this framework and could of course also
-be managed by less sophisticated frameworks without greater issues. For larger
-tasks however, performance may be an issue and this section shall give a crude
-estimate of expected run-times of different tasks.
+be managed by less sophisticated frameworks without greater problems. For larger
+tasks however, performance may be an issue. In this section, I will give a crude
+estimate of what run-times to expect for different tasks.
 
 The main influencing factors to the run-time are the modeling task, the number
-of available threads for parallelization, as well as data size and CPU speed. 
+of available threads for parallel execution, the data size and the CPU speed. 
 
 A local benchmark on an AMD Ryzen 7 1700X on a data set of 500 observations
-resulted in the following performance:
+resulted in the following performances:
 ```
 Linear Regression:    30000 models/threadsec
 Logistic Regression:   2500 models/threadsec
@@ -105,9 +106,7 @@ Therefore, on a typical home-PC setup (16 threads), one could expect to be able
 to evaluate 1,728,000,000 linear regression models in one hour. For logistic
 regression, this number would be 120,000,000 models per hour.
 
-
 ## More about this Package and Exhaustive Searches
-
 In feature and model selection application, exhaustive searches are often 
 referred to as *optimal* search strategies, as they test each setup and 
 therefore ensure to find the best solution. The main downside of this approach 
@@ -144,5 +143,4 @@ the 'combsUpTo' parameter.
 
 The official version includes a consistent and ready-to-use framework. 
 Nevertheless, a lot more can be done. Further development is managed in this 
-github repository. To submit any further ideas, please use the 'Issues' of this
-repository. 
+GitHub repository. To submit further ideas, please open an issue.
