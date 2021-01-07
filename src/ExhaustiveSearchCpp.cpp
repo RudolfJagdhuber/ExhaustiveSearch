@@ -10,6 +10,17 @@
 #include "StatusLog.h"
 
 
+
+
+
+
+
+
+
+
+
+
+
 // [[Rcpp::export]]
 Rcpp::List ExhaustiveSearchCpp(
     const arma::mat& XInput, // Design Matrix (with intercept column!)
@@ -48,14 +59,17 @@ Rcpp::List ExhaustiveSearchCpp(
   StatusLog* SL =  new StatusLog(Comb.getNCombinations());
   if (!quietly) Rcpp::Rcout << SL->header() << std::endl;;
 
+
+  ///// ===> ENTRY POINT OF SEARCHTASK
+
+
+
   // Create threads that each define a ranking object as future. I avoid the
   // simpler std::async to use RcppThread::Thread for interrupt management.
   std::vector<std::future<ranking>> futures;
   // std::vector<RcppThread::Thread> threads;
   std::vector<std::thread> threads;
   for (size_t i = 0; i <  Comb.getNBatches(); i++) {
-    Comb.setCurrentComb(Comb.getBatchLimits()[i]);
-    Comb.setStopComb(Comb.getBatchLimits()[i + 1]);
     std::promise<ranking> p;
     futures.push_back(p.get_future());
     threads.push_back(std::thread(&ExhaustiveThread, i + 1,
@@ -100,6 +114,20 @@ Rcpp::List ExhaustiveSearchCpp(
     CombList.push_front(finaltop.top().second);
     finaltop.pop();
   }
+
+
+
+// // Read the start and stop limits of this task.
+// std::vector<uint> currentComb = Comb.getBatchLimits()[0];
+// std::vector<uint> stoppingComb = Comb.getBatchLimits()[1];
+//
+// auto AicList = currentComb;
+// auto CombList = stoppingComb;
+// setNextCombination(stoppingComb, Comb.getN());
+// auto evaluatedModels = stoppingComb;
+
+
+
 
   // Filling up the result object
   Rcpp::List result;

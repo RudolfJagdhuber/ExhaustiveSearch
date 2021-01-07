@@ -140,8 +140,8 @@ Combination::Combination(uint N, uint k, size_t nBatches) :
 }
 
 
-// Compute and set the next combination from a given one. No check if possible!
-static void setNextCombination(std::vector<uint>& comb, const size_t& N) {
+// A free function that can compute the next combination from a given one
+void setNextCombination(std::vector<uint>& comb, const size_t& N) {
 
     // Get the current length of the combination
     uint k = comb.size();
@@ -164,4 +164,3 @@ static void setNextCombination(std::vector<uint>& comb, const size_t& N) {
             comb[i] = comb[indent] + i - indent;
     }
 }
-

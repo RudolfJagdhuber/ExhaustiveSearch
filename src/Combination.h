@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <math.h>
 
 
 typedef unsigned int  uint;
@@ -21,11 +22,13 @@ class Combination {
 
 public:
 	Combination(uint N, uint k, size_t nBatches);
-	uint getN() { return m_N; }
-	uint getK() { return m_k; }
-	size_t getNCombinations() { return m_nCombinations; }
-	size_t getNBatches() { return m_nBatches; }
-	std::vector<std::vector<uint>> getBatchLimits() { return m_batchLimits; }
-	std::vector<size_t> getBatchSizes() { return m_batchSizes; }
-	static bool setNextCombination(std::vector<uint>& comb);
+	uint getN() const { return m_N; }
+	uint getK() const { return m_k; }
+	size_t getNCombinations() const { return m_nCombinations; }
+	size_t getNBatches() const { return m_nBatches; }
+	std::vector<std::vector<uint>> getBatchLimits() const { return m_batchLimits; }
+	std::vector<size_t> getBatchSizes() const { return m_batchSizes; }
 };
+
+// A free function that can compute the next combination from a given one
+void setNextCombination(std::vector<uint>& comb, const size_t& N);
