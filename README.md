@@ -99,11 +99,11 @@ of available threads for parallel execution, the data size and the CPU speed.
 A local benchmark on an AMD Ryzen 7 1700X on a data set of 500 observations
 resulted in the following performances:
 ```
-Linear Regression:    30000 models/threadsec
+Linear Regression:    45000 models/threadsec
 Logistic Regression:   2500 models/threadsec
 ```
 Therefore, on a typical home-PC setup (16 threads), one could expect to be able
-to evaluate 1,728,000,000 linear regression models in one hour. For logistic
+to evaluate 2,592,000,000 linear regression models in one hour. For logistic
 regression, this number would be 120,000,000 models per hour.
 
 ## More about this Package and Exhaustive Searches
