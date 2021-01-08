@@ -282,11 +282,11 @@ ExhaustiveSearch = function(formula, data, family = NULL,
     performance = cppOutput[[2]],
     featureIDs = cppOutput[[3]])
   result$featureNames = feats
-  result$batchInfo = list(nBatches = cppOutput[[6]],
-    batchSizes = cppOutput[[7]], batchLimits = cppOutput[[8]])
+  result$batchInfo = list(nBatches = cppOutput[[5]],
+    batchSizes = cppOutput[[6]], batchLimits = cppOutput[[7]])
   result$setup = list(call = match.call(), family = family,
     performanceMeasure = performanceMeasure, intercept = intercept,
-    combsUpTo = combsUpTo, nResults = nResults, nThreads = cppOutput[[5]],
+    combsUpTo = combsUpTo, nResults = nResults, nThreads = nThreads,
     testSetIDs = testSetIDs, nTrain = nrow(X), nTest = nrow(XTest))
 
   if (!quietly) {

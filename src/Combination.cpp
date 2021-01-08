@@ -1,4 +1,6 @@
 
+#include <math.h>
+
 #include "Combination.h"
 
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <math.h>
 
 
 typedef unsigned int  uint;

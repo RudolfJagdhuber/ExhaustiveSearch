@@ -9,6 +9,9 @@
 #include "DataSet.h"
 #include "lbfgs.h"
 
+
+typedef unsigned int  uint;
+
 class GLM {
 
 protected:
