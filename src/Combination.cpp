@@ -1,4 +1,6 @@
 
+#include <math.h>
+
 #include "Combination.h"
 
 
@@ -29,9 +31,6 @@ size_t computeCombinations(uint N, uint k){
 
 Combination::Combination(uint N, uint k, size_t nBatches) :
     m_N(N), m_k(k), m_nBatches(nBatches) {
-
-    // Define initial value for current combination with is just "1"
-    m_currentCombination.push_back(1);
 
     // Compute the total number of existing combinations with this setup.
     m_nCombinations = computeCombinations(m_N, m_k);
@@ -143,39 +142,27 @@ Combination::Combination(uint N, uint k, size_t nBatches) :
 }
 
 
-// Compute and set the next combination from the current one
-// returns false if it already was the last combination and true otherwise
-bool Combination::nextCombination() {
-
-    // Have we reached the early stopping combination? Then do nothing.
-    if (m_currentCombination == m_stopCombination) return false;
+// A free function that can compute the next combination from a given one
+void setNextCombination(std::vector<uint>& comb, const size_t& N) {
 
     // Get the current length of the combination
-    uint k = m_currentCombination.size();
+    uint k = comb.size();
 
-    // We want to find the index of the rightmost element in
-    // m_currentCombination that can be increased.  We call its index 'pivot'.
-    int pivot = k - 1;
-    while (pivot >= 0 && m_currentCombination[pivot] == m_N + 1 - k + pivot)
-        --pivot;
+    // We want to find the index of the rightmost element in comb that can be
+    // increased.  We call its index 'indent'.
+    int indent = k - 1;
+    while (indent >= 0 && comb[indent] == N + 1 - k + indent) indent--;
 
-    // pivot will be -1 if the final combination of (N, k) is reached.
-    if (pivot == -1) {
-        // If we are at the max size of our analyzed combinations, we are done
-        if (k == m_k) return false;
-        else { // Otherwise set the first combination of k+1 elements
-            m_currentCombination.clear();
-            m_currentCombination.reserve(k + 1);
-            for (uint i = 1; i <= k + 1; i++) m_currentCombination.push_back(i);
-            return true;
-        }
+    // indent will be -1 if the final combination of size k is reached.
+    if (indent == -1) {
+        // Otherwise set the first combination of k+1 elements
+        comb.clear();
+        comb.reserve(k + 1);
+        for (uint i = 1; i <= k + 1; i++) comb.push_back(i);
     } else {
-        // We increment at pivot and set the following positions accordingly
-        ++m_currentCombination[pivot];
-        for (uint i = pivot + 1; i < k; ++i)
-            m_currentCombination[i] = m_currentCombination[pivot] + i - pivot;
-        return true;
+        // We increment at indent and set the following positions accordingly
+        comb[indent]++;
+        for (uint i = indent + 1; i < k; i++)
+            comb[i] = comb[indent] + i - indent;
     }
-
-
 }

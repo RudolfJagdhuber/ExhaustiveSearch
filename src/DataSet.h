@@ -1,6 +1,7 @@
 #pragma once
 
-#include "globals.h"
+#include <RcppArmadillo.h>
+
 
 // A simple struct to hold pointers to a training/testing data set combination
 struct DataSet {

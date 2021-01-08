@@ -20,7 +20,9 @@ ExhaustiveSearch(
 }
 \arguments{
 \item{formula}{An object of class \link{formula} (or one that can be coerced to
-that class): a symbolic description of the model to be fitted.}
+that class): a symbolic description of the feature and response structure.
+All combinations of features on the right hand side of the formula are
+evaluated.}
 
 \item{data}{A \link{data.frame} (or object coercible by \code{\link[=as.data.frame]{as.data.frame()}} to a
 \link{data.frame}) containing the variables in the model.}
