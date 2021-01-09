@@ -15,10 +15,12 @@ that would normally be seen as unfeasible in standard setups.
 
 ## Installation
 
-This package is not yet available on CRAN. However, I intend to publish it as 
-soon as possible.
+You can install the release version of the ExhaustiveSearch R package from CRAN:
+``` r
+install.packages("ExhaustiveSearch")
+```
 
-Until then you can use the current development version from GitHub:
+The current development version can be installed from GitHub:
 ``` r
 devtools::install_github("RudolfJagdhuber/ExhaustiveSearch")
 ```
@@ -132,7 +134,7 @@ While this framework is able to handle very large amounts of combinations, an
 exhaustive search of every theoretical combination can still be unfeasible. 
 However, a possible way to drastically limit the total number of combinations 
 is to define an upper bound for the size of a combination. For example, 
-evaluating all combinations of 500 features ($3.3\cdot 10^{150}$) is obviously 
+evaluating all combinations of 500 features (`3.3e150`) is obviously 
 impossible. But if we only consider combinations of up to 3 features, this 
 number reduces to around 21 million, which could easily be evaluated by this 
 framework in less than a minute on 16 threads. Setting an upper limit is thus a 
