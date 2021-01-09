@@ -16,10 +16,12 @@ that would normally be seen as unfeasible in standard setups.
 
 ## Installation
 
-This package is not yet available on CRAN. However, I intend to publish it as 
-soon as possible.
+You can install the release version of the ExhaustiveSearch R package from CRAN:
+``` r
+install.packages("ExhaustiveSearch")
+```
 
-Until then you can use the current development version from GitHub:
+The current development version can be installed from GitHub:
 ``` r
 devtools::install_github("RudolfJagdhuber/ExhaustiveSearch")
 ```
