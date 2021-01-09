@@ -1,7 +1,7 @@
 Package: ExhaustiveSearch
 Type: Package
 Title: A Fast and Scalable Exhaustive Feature Selection Framework
-Version: 0.2.0
+Version: 1.0.0
 Authors@R: 
     c(person(given = "Rudolf",
              family = "Jagdhuber",
@@ -16,11 +16,12 @@ Authors@R:
              role = "cph",
              comment = "lbfgs c library"))
 Description: The goal of this package is to provide an easy to use, fast and
-    and scalable exhaustive search framework. Exhaustive feature selections 
+    scalable exhaustive search framework. Exhaustive feature selections 
     typically require a very large number of models to be fitted and evaluated. 
-    Execution speed and memory management are crucial factors for these tasks. 
-    The package solves both issues with a multi-threaded C++ backend, which 
-    keeps memory usage constant by only storing the best results.
+    Execution speed and memory management are crucial factors here. This package 
+    provides solutions for both. Execution speed is optimized by using a 
+    multi-threaded C++ backend, and memory issues are solved by by only storing 
+    the best results during execution and thus keeping memory usage constant.
 License: GPL (>= 3)
 Encoding: UTF-8
 Imports: Rcpp
