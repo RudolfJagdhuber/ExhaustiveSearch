@@ -3,7 +3,6 @@
 
 <!-- badges: start -->
 [![](https://www.r-pkg.org/badges/version/ExhaustiveSearch?color=blue)](https://cran.r-project.org/package=ExhaustiveSearch)
-[![Travis build status](https://travis-ci.com/RudolfJagdhuber/ExhaustiveSearch.svg?branch=master)](https://travis-ci.com/RudolfJagdhuber/ExhaustiveSearch)
 [![R-CMD-check](https://github.com/RudolfJagdhuber/ExhaustiveSearch/workflows/R-CMD-check/badge.svg)](https://github.com/RudolfJagdhuber/ExhaustiveSearch/actions)
 <!-- badges: end -->
 
@@ -134,7 +133,7 @@ While this framework is able to handle very large amounts of combinations, an
 exhaustive search of every theoretical combination can still be unfeasible. 
 However, a possible way to drastically limit the total number of combinations 
 is to define an upper bound for the size of a combination. For example, 
-evaluating all combinations of 500 features ($3.3\cdot 10^{150}$) is obviously 
+evaluating all combinations of 500 features (`3.3e150`) is obviously 
 impossible. But if we only consider combinations of up to 3 features, this 
 number reduces to around 21 million, which could easily be evaluated by this 
 framework in less than a minute on 16 threads. Setting an upper limit is thus a 
