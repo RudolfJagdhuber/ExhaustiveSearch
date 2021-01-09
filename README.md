@@ -3,6 +3,8 @@
 
 <!-- badges: start -->
 [![](https://www.r-pkg.org/badges/version/ExhaustiveSearch?color=blue)](https://cran.r-project.org/package=ExhaustiveSearch)
+[![Travis build status](https://travis-ci.com/RudolfJagdhuber/ExhaustiveSearch.svg?branch=master)](https://travis-ci.com/RudolfJagdhuber/ExhaustiveSearch)
+[![R-CMD-check](https://github.com/RudolfJagdhuber/ExhaustiveSearch/workflows/R-CMD-check/badge.svg)](https://github.com/RudolfJagdhuber/ExhaustiveSearch/actions)
 <!-- badges: end -->
 
 The aim of this R package is to provide an easy to use, fast and and scalable 
