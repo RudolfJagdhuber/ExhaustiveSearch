@@ -22,6 +22,7 @@ A simple function to get a vector of feature names for one or more elements
 of an ExhaustiveSearch object.
 }
 \examples{
+\dontrun{
 ## Exhaustive search on the mtcars data
 data(mtcars)
 ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian")
@@ -31,6 +32,7 @@ getFeatures(ES, 1:3)
 
 ## Get the feature combination of the 531th best model
 getFeatures(ES, 531)
+}
 
 }
 \seealso{

@@ -118,6 +118,7 @@
 #'   \item{setup}{A list of input parameters from the function call.}
 #'
 #' @examples
+#' \dontrun{
 #' ## Linear Regression on mtcars data
 #' data(mtcars)
 #'
@@ -136,10 +137,11 @@
 #' ## Logistic Regression on Ionosphere Data
 #' data("Ionosphere", package = "mlbench")
 #'
-#' ## Only combinations of up to 3 features! -> 4k models instead of 500 million
-#' ES3 <- ExhaustiveSearch((Class == "good") ~ ., data = Ionosphere[,-c(1:5)],
+#' ## Only combinations of up to 3 features! -> 5488 models instead of 4 billion
+#' ES3 <- ExhaustiveSearch((Class == "good") ~ ., data = Ionosphere[,-c(1, 2)],
 #'   family = "binomial", combsUpTo = 3)
 #' print(ES3)
+#' }
 #'
 #' @author Rudolf Jagdhuber
 #'

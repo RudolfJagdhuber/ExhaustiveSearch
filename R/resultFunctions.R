@@ -23,6 +23,7 @@
 #'   signs.
 #'
 #' @examples
+#' \dontrun{
 #' ## Exhaustive search on the mtcars data
 #' data(mtcars)
 #' ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian")
@@ -36,6 +37,7 @@
 #'
 #' ## Add custom characters for printing
 #' resultTable(ES, 1, "  <->  ")
+#' }
 #'
 #' @author Rudolf Jagdhuber
 #'
@@ -67,6 +69,7 @@ resultTable = function(ESResult, n = Inf, insertStart = "") {
 #'   `ranks` includes multiple values, a list of such vectors is returned.
 #'
 #' @examples
+#' \dontrun{
 #' ## Exhaustive search on the mtcars data
 #' data(mtcars)
 #' ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian")
@@ -76,6 +79,7 @@ resultTable = function(ESResult, n = Inf, insertStart = "") {
 #'
 #' ## Get the feature combination of the 531th best model
 #' getFeatures(ES, 531)
+#' }
 #'
 #' @author Rudolf Jagdhuber
 #'
