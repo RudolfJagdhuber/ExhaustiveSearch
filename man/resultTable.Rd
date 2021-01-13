@@ -33,7 +33,6 @@ presents them in a \code{data.frame} together with the respective performance
 values
 }
 \examples{
-\dontrun{
 ## Exhaustive search on the mtcars data
 data(mtcars)
 ES <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian")
@@ -47,7 +46,6 @@ str(res)
 
 ## Add custom characters for printing
 resultTable(ES, 1, "  <->  ")
-}
 
 }
 \seealso{
