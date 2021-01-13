@@ -118,7 +118,6 @@
 #'   \item{setup}{A list of input parameters from the function call.}
 #'
 #' @examples
-#' \dontrun{
 #' ## Linear Regression on mtcars data
 #' data(mtcars)
 #'
@@ -134,6 +133,7 @@
 #' print(ES2)
 #'
 #'
+#' \dontrun{
 #' ## Logistic Regression on Ionosphere Data
 #' data("Ionosphere", package = "mlbench")
 #'

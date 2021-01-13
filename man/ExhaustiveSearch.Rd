@@ -147,7 +147,6 @@ The development version of this package can be found at
 are handled on this page.
 }
 \examples{
-\dontrun{
 ## Linear Regression on mtcars data
 data(mtcars)
 
@@ -163,6 +162,7 @@ ES2 <- ExhaustiveSearch(mpg ~ ., data = mtcars, family = "gaussian",
 print(ES2)
 
 
+\dontrun{
 ## Logistic Regression on Ionosphere Data
 data("Ionosphere", package = "mlbench")
 

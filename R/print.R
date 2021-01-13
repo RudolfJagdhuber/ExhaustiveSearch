@@ -16,6 +16,9 @@ formatSecTime = function(sec) {
 #' @param x Object of class 'ExhaustiveSearch'.
 #' @param ... Further arguments passed to or from other methods.
 #'
+#' @return No return value. The function is only called to print results to the
+#'   console.
+#'
 #' @author Rudolf Jagdhuber
 #'
 #' @seealso [ExhaustiveSearch()]

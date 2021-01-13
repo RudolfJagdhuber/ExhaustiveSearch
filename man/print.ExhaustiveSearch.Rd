@@ -11,6 +11,10 @@
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+No return value. The function is only called to print results to the
+console.
+}
 \description{
 Prints a compact summary of the results of an ExhaustiveSearch object.
 }
