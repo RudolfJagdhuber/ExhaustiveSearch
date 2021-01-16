@@ -1,7 +1,7 @@
 Package: ExhaustiveSearch
 Type: Package
 Title: A Fast and Scalable Exhaustive Feature Selection Framework
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     c(person(given = "Rudolf",
              family = "Jagdhuber",
