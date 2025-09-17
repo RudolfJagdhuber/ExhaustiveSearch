@@ -10,4 +10,4 @@
 
 ### Patch 1.0.2
 
-* Removed hard dependency on C++11. Changed to min requirement in DESCRIPTION.
+* Removed dependency on C++11 in Makevars and Makevars.win.
