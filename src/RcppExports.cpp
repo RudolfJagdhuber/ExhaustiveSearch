@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // ExhaustiveSearchCpp
 Rcpp::List ExhaustiveSearchCpp(const arma::mat& XInput, const std::vector<double>& yInput, const arma::mat& XTestSet, const std::vector<double>& yTestSet, std::string family, std::string performanceMeasure, bool intercept, size_t combsUpTo, size_t nResults, size_t nThreads, double errorVal, bool quietly);
 RcppExport SEXP _ExhaustiveSearch_ExhaustiveSearchCpp(SEXP XInputSEXP, SEXP yInputSEXP, SEXP XTestSetSEXP, SEXP yTestSetSEXP, SEXP familySEXP, SEXP performanceMeasureSEXP, SEXP interceptSEXP, SEXP combsUpToSEXP, SEXP nResultsSEXP, SEXP nThreadsSEXP, SEXP errorValSEXP, SEXP quietlySEXP) {
