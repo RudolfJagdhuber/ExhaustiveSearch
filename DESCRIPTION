@@ -1,7 +1,7 @@
 Package: ExhaustiveSearch
 Type: Package
 Title: A Fast and Scalable Exhaustive Feature Selection Framework
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: 
     c(person(given = "Rudolf",
              family = "Jagdhuber",
@@ -26,7 +26,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 Imports: Rcpp
 LinkingTo: Rcpp, RcppArmadillo
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/RudolfJagdhuber/ExhaustiveSearch
 BugReports: https://github.com/RudolfJagdhuber/ExhaustiveSearch/issues
